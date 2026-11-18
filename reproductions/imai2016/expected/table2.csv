@@ -1,0 +1,12 @@
+# Imai & Khanna 2016, Table 2 (p.270), typed from the PDF. Rows/columns in Table2.R's order.
+row,goodman_bias,goodman_rmse,ei_bias,ei_rmse,name_bias,name_rmse,bayes_bias,bayes_rmse
+precinct_white,0.003,0.069,0.041,0.062,-0.003,0.015,-0.003,0.012
+precinct_black,-0.102,0.162,-0.133,0.217,-0.009,0.043,-0.007,0.039
+precinct_latino,-0.114,0.251,-0.163,0.250,0.016,0.042,0.011,0.035
+precinct_asian,0.017,0.713,-0.470,0.550,0.041,0.116,0.040,0.111
+precinct_other,-0.214,0.499,-0.338,0.450,0.068,0.109,0.048,0.094
+district_white,0.008,0.037,0.047,0.058,-0.007,0.012,-0.001,0.004
+district_black,-0.147,0.197,-0.215,0.267,0.009,0.020,-0.006,0.010
+district_latino,-0.272,0.463,-0.300,0.354,0.045,0.052,0.017,0.021
+district_asian,0.072,0.808,-0.459,0.530,0.055,0.058,0.043,0.046
+district_other,-0.229,0.527,-0.342,0.448,0.073,0.078,0.042,0.053

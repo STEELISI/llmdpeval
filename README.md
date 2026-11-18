@@ -1,101 +1,142 @@
 # LLM DP Evaluation
 
-This repository generates Python solutions for differential privacy tasks with optional RAG context, then evaluates the generated code by running each generated script.
+This repository tests whether LLMs can write differentially private (DP) Python code. It generates code for DP
+tasks, with or without retrieved context from a corpus of DP outlines, runs the code in a sandbox, and supports
+grading the results by hand. The original design (prompts, data, generation, the runnable check and the first
+evaluation) is by Pithayuth Charnsethikul in the upstream STEELISI/llmdpeval repository; this version replaces
+its retrieval and evaluation.
+
+- [docs/method.md](docs/method.md): the pipeline step by step.
+- [docs/architecture.md](docs/architecture.md): a diagram of one generation and the module list.
+- [docs/grading_rubric.md](docs/grading_rubric.md): the grades and the ground truth.
+- [sphere/README.md](sphere/README.md): running the evaluation on a SPHERE experiment node.
 
 ## Setup
 
-Use Python 3.10 or newer.
+Use Python 3.11 or newer. Run every command from the repo root.
 
 ```bash
 python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
+source venv/bin/activate          # Windows: venv\Scripts\activate
+pip install -r requirements-lock.txt
+pip check
+pip install --no-deps -e .        # or set PYTHONPATH=src
+python -m llmdpeval.verify_env
 ```
 
-For local models, make sure Ollama is running and the selected models are available. The default task runner uses:
+`requirements-lock.txt` is the exact environment the grids ran in; `run_grid` refuses to start if the installed
+packages differ from it. It also pins `weave`, which the code does not import.
 
-- `nomic-embed-text` for embeddings
-- `codellama:7b` for code generation
+API keys are read from the environment variable, or else from a key file:
 
-For hosted models, provide the matching API key file in the project root (create a file and enter the key in there):
+- `sphere_key.txt` (`SPHERE_LLM_API_KEY`): sphere-llm.net models and embeddings
+- `openai_key.txt` (`OPENAI_API_KEY`), `anthropic_key.txt` (`ANTHROPIC_API_KEY`), `gemini_key.txt` (`GOOGLE_API_KEY`)
 
-- `openai_key.txt`
-- `anthropic_key.txt`
-- `gemini_key.txt`
+Key files live in `~/.llmdpeval_keys/` (Windows: `%USERPROFILE%\.llmdpeval_keys\`) or in the folder
+`LLMDPEVAL_KEY_DIR` names. If neither exists, the repo root (gitignored) is read, with a warning. Keep them outside
+the repo: generated code never gets the keys in its environment, but on a local machine it runs with your user
+rights and could read a key file by its path.
 
-## Build Or Load The RAG Index
-
-When using RAG, build the LlamaIndex vector index before querying:
+## Corpus and index
 
 ```bash
-python llamaindex_indexing.py --embed nomic-embed-text
+python -m llmdpeval.check_corpus --workers 4     # outlines, skeleton tests, theory cards
+python -m llmdpeval.rag build                    # embed outlines + theory cards (needs the sphere key)
+python -m llmdpeval.rag eval --query fields --filter framework --k 1 3 5
 ```
 
-The index is saved under `storage/` according to the selected embedding model. If the index already exists, the script loads it instead of rebuilding it.
+`corpus/` holds `opendp/`, `diffprivlib/`, `numpy/` (outlines `.md` and verified skeletons `.py`), `theory/`
+(theory cards) and `api_index/` (API lists used while writing; not retrieved). The format is in
+`corpus/FORMAT.md`, sources and licences in `corpus/SOURCES.md`. The index is saved under `storage/`. When the
+corpus, the embedded metadata, the embedding model or the node format change, `rag build` rebuilds it;
+generation and repair stop with a message to run `rag build` first, because several generations run at once and
+must not write the same index.
 
-## Generate Code
-
-Edit `run_tasks.sh` to adjust the run configuration:
-
-- `RAG`: use retrieval augmented generation (`True` or `False`)
-- `EMBED_MODEL`: embedding model used when `RAG=True`
-- `LLM_MODEL`: model used to generate code
-- `FRAMEWORK`: DP framework to request in the prompt (`OpenDP`, `Diffprivlib`, or `PipelineDP`)
-- `RUN_COUNT`: number of generations per task
-- `tasks`: task prompt names from `prompts/*.txt`
-
-Then run:
+## Generate
 
 ```bash
-./run_tasks.sh
+python -m llmdpeval.run_grid --grid-dir generated_code/grid_A     # every setting from pipeline.toml
+python -m llmdpeval.run_grid --grid-dir generated_code/grid_B --runs 4 \
+    --conditions OpenDP-rag-k3 Diffprivlib-rag-k3 None-rag-k3 --theory --code --think off
 ```
 
-The script saves generated Python files under:
+- `--conditions`: `None`, `Diffprivlib`, `OpenDP` (task prompt only) and `<framework>-rag-k<K>` (K retrieved
+  outlines). K values come from `rag_k` in `pipeline.toml`.
+- `--template guided|plain`, `--theory`, `--code`, `--holdout`, `--repair N`, `--think on|off`, `--hard-cap SECONDS`:
+  see docs/method.md. `pipeline.toml` sets `repair = 0`, so generation only calls the model and can run on an XDC.
+- `--models` (default: `models` in `pipeline.toml`), `--tasks` (default: stat_count, selection_topk,
+  ml_regression; `app_<name>` for a paper application).
 
-```text
-generated_code/<model>_<rag>_<framework>_<timestamp>/
-```
+Each cell is a folder `<model>_<rag part>_<framework><flags>` with `<task>_code_<run>.py` and a generation log.
+Existing files are skipped, so the same command resumes a stopped grid. A generation killed by the hard cap is
+marked `<task>_code_<run>.timeout` and is not generated again. One generation can also be run alone:
+`python -m llmdpeval.generate --llm gemma4:latest --task stat_count --framework OpenDP --k 3 --output-dir DIR`.
 
-For example:
+Two prompts differ from the upstream versions: `stat_composition` used `Master` (no row matches; the data has
+`Masters`), and `ml_regression` took its bounds from the data. Grids made with the upstream prompts are not
+comparable on these two tasks.
 
-```text
-generated_code/codellama-7b_rag_OpenDP_1785277012414351176/
-```
+## Where code runs
 
-Keep the timestamp from the folder name. You will use it for evaluation.
+Generated code is untrusted and never runs on an XDC. On Linux it runs only on a SPHERE experiment node as a
+separate user with no network (`sphere/README.md`, `LLMDPEVAL_SANDBOX_USER`); on a local machine the sandbox is a
+scratch folder, an allowlisted environment and a timeout, which is not isolation (docs/method.md, section 8).
+`run_grid --evaluate`, `run_grid --repair`, `generate --repair`, `repair` and `grade median` refuse to start on
+Linux when the hostname contains `xdc`, or anywhere when `LLMDPEVAL_NO_EXEC=1` (set it on an XDC whose name has
+no `xdc`).
 
-## Evaluate Generated Code
-
-Run the evaluator with a timestamp substring that uniquely matches one generated folder:
+## Evaluate and repair
 
 ```bash
-python code_evaluation.py --ts 1785277012414351176
+python -m llmdpeval.run_grid --grid-dir generated_code/grid_A --evaluate --eval-workers 4
+python -m llmdpeval.repair generated_code/grid_A generated_code/grid_A_fix2 --rounds 2
+python -m llmdpeval.run_grid --grid-dir generated_code/grid_A_fix2 --evaluate --eval-workers 4
+python -m llmdpeval.repair --selftest
 ```
 
-The evaluator runs each `.py` file in the matching `generated_code` folder and writes a JSON log to `evaluation_logs/`. The console summary reports how many scripts were runnable versus failed. The JSON log includes each script path, return code, stdout, and stderr so failures and errors can be inspected.
+`--evaluate` writes `<grid>/results.jsonl`, one line per script. Code that `sandbox.is_unsafe` flags (network,
+processes, file deletion) is not run (`"status": "unsafe_not_run"`) and is graded by hand; an answer with no code
+is graded N. `repair` picks the crashed and the privacy-flagged scripts from `results.jsonl` and sends one kind of
+feedback per round (docs/method.md, section 7). Evaluate the repaired grid afterwards.
 
-## Important Files
+## Grade
 
-### `llamaindex_indexing.py`
+```bash
+python -m llmdpeval.grade triage generated_code/grid_A           # flags to check first -> triage.csv
+python -m llmdpeval.grade table generated_code/grid_A --runs 4   # hand_grades.csv -> grades.csv + summary
+python -m llmdpeval.grade median generated_code/grid_A --n 20    # G vs U on the median of 20 re-runs (P stays P)
+python -m llmdpeval.app_grade generated_code/grid_A              # suggested grades for paper applications
+```
 
-Builds or loads the RAG index. It preprocesses text files in `rag_corpus/`, converts document sections into LlamaIndex nodes, creates a `VectorStoreIndex`, and persists it under the embedding-specific directory in `storage/`.
+Hand grades (`hand_grades.csv`: cell, task, run, grade, reason) stay next to the grid outputs, not in the repo.
+`grade median` re-runs only the three toy tasks; paper applications keep their hand grade.
 
-### `llamaindex_querying.py`
+## Checks
 
-Generates code for one task. It loads a prompt from `prompts/{task}.txt`, injects the requested DP framework, optionally retrieves relevant documentation from the saved LlamaIndex index, and sends the final prompt to the selected LLM. Generated code is saved to the requested output directory.
+```bash
+python -m pytest tests/
+python -m llmdpeval.helper && python -m llmdpeval.sandbox && python -m llmdpeval.repair --selftest
+```
 
-### `run_tasks.sh`
+## Paper applications
 
-Batch runner for code generation. It sets default model/framework parameters, defines the list of tasks to run, creates one timestamped output folder in `generated_code/`, and calls `llamaindex_querying.py` for each task and run index.
+`applications/<app>/` holds `original.py` (the analysis without DP), `prompt.txt`, `spec.md` (privacy setup,
+expected releases, utility target), `reference_dp.py` and `ceiling.py`. The data goes in `applications/<app>/data/`
+and the reference runs in `runs/`; both are gitignored. Run an application as a grid task, e.g.
+`--tasks app_gopher_sqf --hard-cap 3600`.
 
-### `code_evaluation.py`
+## Reproductions
 
-Evaluates a timestamped generated-code folder. It finds the folder in `generated_code/`, runs each generated Python file with a timeout, prints a runnable/failed summary, and saves detailed execution logs under `evaluation_logs/`.
+`reproductions/<paper>/` holds the recipe to re-run a published paper's own code: `fetch.sh` (pinned commit),
+`env/` (locks and setup), `run.sh`, `compare.py` and `expected/` where the paper's numbers had to be typed in.
+`RESULT.md` records what matched. The papers' code, data and run outputs are not in git.
 
-### Supporting Files
+## Layout
 
-- `helper.py`: shared model configuration, prompt loading, RAG corpus preprocessing, retrieval printing, and context postprocessing utilities.
-- `metadata.py`: extracts document sections and code blocks from the RAG text corpus.
-- `weave_trace.py`: wraps generation and optional evaluation helpers with Weave tracing, and handles generated code file creation.
-- `prompts/`: task prompts used for code generation.
-- `rag_corpus/`: documentation text used as retrieval context.
+- `src/llmdpeval/`: the package (module list in docs/architecture.md).
+- `prompts/`: toy task prompts. `data/`: `adult_clean.csv` (UCI Adult) and `auto_mpg_clean.csv` (UCI Auto MPG).
+- `corpus/`: outlines, skeletons and theory cards. `rag_eval/`: dev tasks and relevance labels for retrieval metrics.
+- `applications/`, `reproductions/`: paper applications and paper reproductions.
+- `pipeline.toml`: every generation setting in one place.
+- `sphere/`: the SPHERE node model and setup script.
+- `tests/`: regression checks (no LLM, no network).

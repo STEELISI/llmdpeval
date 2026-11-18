@@ -1,0 +1,18 @@
+You are given two csv files, `sqf_train.csv` (48,605 rows) and `sqf_test.csv` (23,941 rows), from the New York City Police Department's stop, question and frisk (SQF) data. Each row is one stop. The column `frisked` is 1 if the stopped person was frisked and 0 otherwise. The column `race` is the sensitive attribute (0 = protected group, 1 = privileged group). The other columns are integer codes: `build`, `age`, `ht_feet` and `weight` take the codes 0, 1 or 2 (for `age`: 0 = under 25, 1 = 25 to 45, 2 = over 45); `perobs`, `cs_objcs`, `cs_descr`, `cs_casng`, `cs_lkout`, `cs_drgtr`, `cs_vcrim`, `ac_proxm`, `inout_I`, `inout_O`, `sex_F` and `sex_M` take the codes 0 or 1 (`inout_I`/`inout_O` and `sex_F`/`sex_M` are one-hot pairs). The model's features are the 17 columns other than `frisked`, including `race`: `race`, `build`, `age`, `ht_feet`, `weight`, `perobs`, `cs_objcs`, `cs_descr`, `cs_casng`, `cs_lkout`, `cs_drgtr`, `cs_vcrim`, `ac_proxm`, `inout_I`, `inout_O`, `sex_F`, `sex_M`, so X has shape (rows, 17) before any intercept column.
+
+Here is existing analysis code that trains a logistic regression to predict `frisked` and measures its accuracy and its statistical parity difference across `race`:
+
+{code}
+
+Rewrite this analysis so that its outputs are differentially private.
+
+Requirements:
+1. Treat each row of both files as one individual. Two datasets are neighbours if one row is replaced by another (replace-one); the number of rows in each file is public. The size of every subgroup (for example the number of rows with `race` = 0) is private. Any preprocessing (scaling, standardisation, clipping bounds) must not use statistics computed from the data (such as its mean, standard deviation, minimum or maximum); the codes listed above are public.
+2. Make these outputs differentially private: the trained model (its weights are released), its test accuracy, and its statistical parity difference. Both are measured on `sqf_test.csv` for the released model: the accuracy is the share of test rows whose predicted label (probability > 0.5) equals `frisked`, and the statistical parity difference is the mean predicted probability of the rows with `race` = 0 minus that of the rows with `race` = 1. The subset-removal part of the code (support and bias reduction) is out of scope: leave it out. Keep the existing code's data loading and helper functions as given; change only what privacy requires.
+3. Use a total privacy budget of epsilon = 1 and delta = 0 across all outputs.
+4. Use the following DP framework: OpenDP.
+   If that framework has no mechanism for one of the releases (OpenDP has no logistic regression), use diffprivlib or NumPy (objective perturbation) for that release only, and the named framework for the others.
+5. Print three values of each output, labelled: the true value from the existing analysis code as given (original); the true value from your own analysis without noise (the same model, preprocessing and steps as your private version, run without differential privacy; it equals the original if you kept the analysis); and the differentially private value. Also print the epsilon used by each private output and in total.
+6. End the output with one line that is a JSON object with the keys `true_original_accuracy`, `true_own_accuracy`, `dp_accuracy`, `true_original_spd`, `true_own_spd`, `dp_spd` and `epsilon_total`.
+7. The data directory is the first command-line argument.
+8. Return only executable Python code.

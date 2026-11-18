@@ -1,0 +1,13 @@
+# Imai & Khanna 2016, Table 1 (p.268), typed from the PDF. Rows in Table1.R's order; columns = predictions 1-5.
+row,name,name_precinct,name_block,name_precinct_party,name_block_party
+overall_error,0.215,0.158,0.152,0.151,0.145
+white_fn,0.047,0.060,0.059,0.065,0.061
+white_fp,0.523,0.294,0.266,0.257,0.237
+black_fn,0.839,0.381,0.320,0.290,0.249
+black_fp,0.011,0.027,0.026,0.033,0.029
+latino_fn,0.193,0.150,0.155,0.158,0.162
+latino_fp,0.037,0.039,0.038,0.038,0.037
+asian_fn,0.540,0.519,0.533,0.520,0.532
+asian_fp,0.006,0.007,0.007,0.007,0.007
+other_fn,0.991,0.989,0.969,0.989,0.968
+other_fp,0.001,0.001,0.002,0.001,0.002

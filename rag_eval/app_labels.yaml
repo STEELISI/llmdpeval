@@ -1,0 +1,250 @@
+# Retrieval labels for the paper applications: each app's expected releases (from its spec.md "Expected releases"),
+# with the corpus task types and, per framework, the outline ids that count as a correct retrieval for that release.
+# An empty list means the framework has no such item (OpenDP has no logistic regression); those cells are not scored.
+# composition: the budget-splitting items, scored as "is one in the context" when an app has 2+ releases.
+# Disclosure: after the first app-eval run, four ids were added as valid alternatives that the
+# retriever had found (per-group rates for accuracy by group; group-by with public keys for counts per group):
+# opendp-group-rates-parity-difference, opendp-polars-groupby-public-keys (x2), numpy-groupwise-rate-noisy-ratio.
+# Later corpus items were added next to the existing ids for the releases they cover (existing ids kept).
+# The two inference releases use the task type inference.
+# 2026-11 corpus expansion: new pattern items added as valid ids for the releases they cover.
+apps:
+  gopher_sqf:
+    - name: model
+      query_type: Logistic regression
+      definition: Train a logistic regression classifier predicting frisked on the training rows.
+      target_columns: [frisked, race, build, age, ht_feet, weight, perobs, cs_objcs, cs_descr, cs_casng, cs_lkout,
+                       cs_drgtr, cs_vcrim, ac_proxm, inout_I, inout_O, sex_F, sex_M]
+      conditions: [rows of sqf_train.csv]
+      task_types: [classification]
+      relevant:
+        OpenDP: []
+        Diffprivlib: [diffprivlib-logistic-regression-public-unit-norm, diffprivlib-logistic-onehot-public-levels-evaluation]
+        None: [numpy-logistic-regression-objective-perturbation, numpy-logistic-regression-output-perturbation,
+               numpy-logistic-regression-noisy-gd, numpy-logistic-onehot-public-levels-evaluation]
+    - name: accuracy
+      query_type: Accuracy
+      definition: Share of test rows whose predicted label equals frisked (the number of test rows is public).
+      target_columns: [frisked, prediction]
+      conditions: [rows of sqf_test.csv]
+      task_types: [count, classification]
+      relevant:
+        OpenDP: [opendp-fraction-of-rows-public-n, opendp-group-confusion-fairness-metrics]
+        Diffprivlib: [diffprivlib-fraction-of-rows-public-n, diffprivlib-dp-model-evaluation,
+                      diffprivlib-group-confusion-fairness-metrics]
+        None: [numpy-fraction-of-rows-public-n, numpy-group-confusion-fairness-metrics]
+    - name: spd
+      query_type: Statistical parity difference
+      definition: Mean predicted frisk probability over race == 0 minus the same over race == 1, on the test rows.
+      target_columns: [predicted probability, race]
+      conditions: [rows of sqf_test.csv]
+      task_types: [histogram, mean]
+      relevant:
+        OpenDP: [opendp-group-rates-parity-difference, opendp-mean-difference-noise-aware-test]
+        Diffprivlib: [diffprivlib-group-rates-parity-difference, diffprivlib-means-by-group,
+                      diffprivlib-mean-difference-noise-aware-test]
+        None: [numpy-groupwise-rate-noisy-ratio, numpy-groupwise-mean-parallel-composition,
+               numpy-mean-difference-noise-aware-test]
+  kulynych_adult:
+    - name: model
+      query_type: Logistic regression
+      definition: Train a logistic regression classifier predicting income on the training half of the rows.
+      target_columns: [income, work-class, marital-status, occupation, relationship, race, sex, native-country,
+                       hours-per-week, capital-loss, capital-gain, education-num]
+      conditions: [training half]
+      task_types: [classification]
+      relevant:
+        OpenDP: []
+        Diffprivlib: [diffprivlib-logistic-regression-public-unit-norm, diffprivlib-logistic-onehot-public-levels-evaluation]
+        None: [numpy-logistic-regression-objective-perturbation, numpy-logistic-regression-output-perturbation,
+               numpy-logistic-regression-noisy-gd, numpy-logistic-onehot-public-levels-evaluation]
+    - name: accuracy_by_group
+      query_type: Accuracy by group
+      definition: Test accuracy overall and within each race group.
+      target_columns: [income, prediction, race]
+      conditions: [test half]
+      task_types: [histogram, count]
+      relevant:
+        OpenDP: [opendp-fraction-of-rows-public-n, opendp-histogram-count-by-categories,
+                 opendp-group-rates-parity-difference, opendp-polars-groupby-public-keys,
+                 opendp-group-confusion-fairness-metrics]
+        Diffprivlib: [diffprivlib-fraction-of-rows-public-n, diffprivlib-dp-model-evaluation,
+                      diffprivlib-histogram-categorical, diffprivlib-logistic-onehot-public-levels-evaluation,
+                      diffprivlib-group-confusion-fairness-metrics]
+        None: [numpy-fraction-of-rows-public-n, numpy-laplace-histogram-public-categories,
+               numpy-groupwise-rate-noisy-ratio, numpy-logistic-onehot-public-levels-evaluation,
+               numpy-group-confusion-fairness-metrics]
+    - name: counts_by_race
+      query_type: Count by group
+      definition: Number of rows in each race category (public category list).
+      target_columns: [race]
+      conditions: []
+      task_types: [histogram]
+      relevant:
+        OpenDP: [opendp-histogram-count-by-categories, opendp-polars-groupby-public-keys]
+        Diffprivlib: [diffprivlib-histogram-categorical]
+        None: [numpy-laplace-histogram-public-categories]
+  frymer_cces:  # applications/frymer_cces/spec.md, Expected releases
+    - name: model1
+      query_type: Linear regression (OLS)
+      definition: OLS of racial_resentment on union_member and past_union_member, white respondents.
+      target_columns: [racial_resentment, union_member, past_union_member]
+      conditions: [complete rows]
+      task_types: [regression]
+      relevant:
+        OpenDP: [opendp-linear-regression-sufficient-stats-multi, opendp-ols-noisy-moments-se]
+        Diffprivlib: [diffprivlib-linear-regression, diffprivlib-ols-noisy-moments-se]
+        None: [numpy-linear-regression-sufficient-stats, numpy-linear-regression-ssp-centred-public-n,
+               numpy-linear-regression-ssp-gaussian, numpy-ols-noisy-moments-se]
+    - name: model2
+      query_type: Linear regression (OLS)
+      definition: Model 1 plus gender, family income, age, education and state fixed effects.
+      target_columns: [racial_resentment, union_member, past_union_member, gender, famincome, age, educ, state_pre]
+      conditions: [complete rows]
+      task_types: [regression]
+      relevant:
+        OpenDP: [opendp-linear-regression-sufficient-stats-multi, opendp-ols-noisy-moments-se]
+        Diffprivlib: [diffprivlib-linear-regression, diffprivlib-ols-noisy-moments-se]
+        None: [numpy-linear-regression-sufficient-stats, numpy-linear-regression-ssp-centred-public-n,
+               numpy-linear-regression-ssp-gaussian, numpy-ols-noisy-moments-se]
+    - name: model3
+      query_type: Linear regression (OLS)
+      definition: Model 2 plus year fixed effects.
+      target_columns: [racial_resentment, union_member, past_union_member, gender, famincome, age, educ, state_pre, year]
+      conditions: [complete rows]
+      task_types: [regression]
+      relevant:
+        OpenDP: [opendp-linear-regression-sufficient-stats-multi, opendp-ols-noisy-moments-se]
+        Diffprivlib: [diffprivlib-linear-regression, diffprivlib-ols-noisy-moments-se]
+        None: [numpy-linear-regression-sufficient-stats, numpy-linear-regression-ssp-centred-public-n,
+               numpy-linear-regression-ssp-gaussian, numpy-ols-noisy-moments-se]
+    - name: group_means
+      query_type: Mean per group
+      definition: Mean racial_resentment of union members and of non-members, and their difference.
+      target_columns: [racial_resentment, union_member]
+      conditions: [complete rows of model 1; group sizes are private]
+      task_types: [mean, histogram]
+      relevant:
+        OpenDP: [opendp-histogram-count-by-categories, opendp-polars-groupby-sum-mean-keys,
+                 opendp-mean-difference-noise-aware-test]
+        Diffprivlib: [diffprivlib-means-by-group, diffprivlib-mean-difference-noise-aware-test]
+        None: [numpy-groupwise-mean-parallel-composition, numpy-mean-difference-noise-aware-test]
+    - name: inference
+      query_type: Hypothesis test (noise-aware)
+      definition: SE and p-value of each union coefficient and of the mean difference, with the DP noise variance added.
+      target_columns: [outputs of the releases above]
+      conditions: []
+      task_types: [inference]
+      relevant:  # noise-aware SE items exist for every framework
+        OpenDP: [opendp-canonical-noise-hypothesis-test, opendp-ols-noisy-moments-se,
+                 opendp-mean-difference-noise-aware-test]
+        Diffprivlib: [diffprivlib-ols-noisy-moments-se, diffprivlib-mean-difference-noise-aware-test]
+        None: [numpy-ols-noisy-moments-se, numpy-mean-difference-noise-aware-test]
+  zhang_faers:  # applications/zhang_faers/spec.md, Expected releases
+    - name: ae_counts
+      query_type: Count per category (histogram)
+      definition: Number of reports listing each public AE term, in the 2019 window and in the 2020 window; at most K = 6 AEs per report.
+      target_columns: [aes, window]
+      conditions: [all reports; AEs not in drop_before_test]
+      task_types: [histogram]
+      relevant:
+        OpenDP: [opendp-histogram-count-by-categories, opendp-polars-identifier-truncation,
+                 opendp-contribution-bounded-histogram, opendp-two-group-item-tables-noise-aware]
+        Diffprivlib: [diffprivlib-histogram-categorical, diffprivlib-contribution-bounded-histogram,
+                      diffprivlib-two-group-item-tables-noise-aware]
+        None: [numpy-laplace-histogram-public-categories, numpy-contribution-bounded-histogram,
+               numpy-two-group-item-tables-noise-aware]
+    - name: window_counts
+      query_type: Count per group
+      definition: Number of reports in each window (n19; n20 = n - n19).
+      target_columns: [window]
+      conditions: [all reports]
+      task_types: [count]
+      relevant:
+        OpenDP: [opendp-histogram-count-by-categories, opendp-two-group-item-tables-noise-aware]
+        Diffprivlib: [diffprivlib-histogram-categorical, diffprivlib-two-group-item-tables-noise-aware]
+        None: [numpy-laplace-histogram-public-categories, numpy-two-group-item-tables-noise-aware]
+    - name: ror_test
+      query_type: Ratio and hypothesis test (noise-aware)
+      definition: ROR per AE from the noisy 2x2 counts and a Bonferroni significance verdict whose test includes the DP noise variance.
+      target_columns: [noisy counts]
+      conditions: []
+      task_types: [inference, histogram]
+      relevant:  # the three 2x2 items include a noise-aware log-OR test
+        OpenDP: [opendp-canonical-noise-hypothesis-test, opendp-two-by-two-table-odds-ratio,
+                 opendp-two-group-item-tables-noise-aware]
+        Diffprivlib: [diffprivlib-two-by-two-table-odds-ratio, diffprivlib-two-group-item-tables-noise-aware]
+        None: [numpy-two-by-two-table-odds-ratio, numpy-two-group-item-tables-noise-aware]
+    - name: top100
+      query_type: Top-k selection
+      definition: The 100 main-table AEs with >= 100 reports in a window and the smallest p, sorted by ROR.
+      target_columns: [noisy counts, p-value, ROR]
+      conditions: [AEs not in drop_from_table]
+      task_types: [selection, histogram]
+      relevant:
+        OpenDP: [opendp-topk-count-from-histogram, opendp-noisy-max-selection]
+        Diffprivlib: [diffprivlib-exponential-topk-peeling, diffprivlib-topk-joint-exponential-subsets]
+        None: [numpy-topk-from-noisy-histogram, numpy-topk-peeling-laplace, numpy-report-noisy-max]
+  imai_fl:  # applications/imai_fl/spec.md, Expected releases
+    - name: confusion_counts
+      query_type: Count per group (confusion counts)
+      definition: For each of 5 predictions, voters per (self-reported race, predicted class) cell; Table 1 rates are ratios.
+      target_columns: [SR, predicted race]
+      conditions: [all rows]
+      task_types: [histogram, count]
+      relevant:
+        OpenDP: [opendp-histogram-count-by-categories, opendp-group-rates-parity-difference,
+                 opendp-confusion-matrix-error-rates]
+        Diffprivlib: [diffprivlib-histogram-categorical, diffprivlib-group-rates-parity-difference,
+                      diffprivlib-confusion-matrix-error-rates]
+        None: [numpy-laplace-histogram-public-categories, numpy-groupwise-rate-noisy-ratio,
+               numpy-confusion-matrix-error-rates]
+    - name: observed_turnout
+      query_type: Count and sum per group
+      definition: Voters and voters who voted per self-reported race, per precinct and per district.
+      target_columns: [SR, vote08, Precinct, District]
+      conditions: [all rows]
+      task_types: [histogram, sum]
+      relevant:
+        OpenDP: [opendp-polars-groupby-sum-mean-keys, opendp-polars-groupby-public-keys,
+                 opendp-partition-vector-sums]
+        Diffprivlib: [diffprivlib-means-by-group, diffprivlib-sum-bounded, diffprivlib-partition-ratio-of-sums,
+                      diffprivlib-partition-vector-sums]
+        None: [numpy-groupwise-mean-parallel-composition, numpy-groupwise-rate-noisy-ratio,
+               numpy-partition-ratio-of-sums, numpy-partition-vector-sums]
+    - name: predicted_turnout
+      query_type: Sum per group
+      definition: Per precinct and district, sum of Pr(race) and of Pr(race) x vote08 for name-only and Bayesian predictions; estimate = ratio.
+      target_columns: [race probabilities, vote08, Precinct, District]
+      conditions: [all rows]
+      task_types: [sum, mean]
+      relevant:
+        OpenDP: [opendp-polars-groupby-sum-mean-keys, opendp-laplace-sum-bounded, opendp-partition-vector-sums]
+        Diffprivlib: [diffprivlib-sum-bounded, diffprivlib-means-by-group, diffprivlib-partition-ratio-of-sums,
+                      diffprivlib-partition-vector-sums]
+        None: [numpy-laplace-sum-bounded, numpy-groupwise-rate-noisy-ratio, numpy-partition-ratio-of-sums,
+               numpy-partition-vector-sums]
+    - name: goodman
+      query_type: Linear regression per group (Goodman)
+      definition: Per district, regress precinct-part turnout on its share of each race; estimate = intercept + slope.
+      target_columns: [vote08, SR, Precinct, District]
+      conditions: [precinct parts within each district]
+      task_types: [regression]
+      relevant:
+        OpenDP: [opendp-linear-regression-sufficient-stats-multi, opendp-partition-vector-sums]
+        Diffprivlib: [diffprivlib-linear-regression, diffprivlib-partition-vector-sums]
+        None: [numpy-linear-regression-sufficient-stats, numpy-partition-vector-sums]
+    - name: errors
+      query_type: Weighted mean of errors (bias, RMSE)
+      definition: Bias and RMSE of each method's estimates against observed turnout, per race, precinct and district level.
+      target_columns: [outputs of the releases above]
+      conditions: [per race]
+      task_types: [mean]
+      relevant:  # errors are post-processing of the partition-sums release
+        OpenDP: [opendp-partition-vector-sums]
+        Diffprivlib: [diffprivlib-partition-vector-sums]
+        None: [numpy-partition-vector-sums]
+composition:
+  OpenDP: [opendp-composition-basic, opendp-polars-per-query-budget]
+  Diffprivlib: [diffprivlib-accountant-total-budget, diffprivlib-summary-statistics-split]
+  None: [numpy-composition-budget-split]

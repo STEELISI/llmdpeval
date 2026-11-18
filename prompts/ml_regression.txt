@@ -13,8 +13,9 @@ Requirements:
 2. Compute the differentially private prediction by fitting a differentially private linear regression model and predicting the outcome for the same test inputs.
 3. Use the following privacy parameters:
     - epsilon = 1
-    - bounds_x = (1613.0, 5140.0)
-    - bounds_y = (9.0, 46.6)
+    - bounds_x = (1500.0, 5500.0)  (public domain knowledge: the range of car weights in lb, not measured from the data)
+    - bounds_y = (5.0, 50.0)  (public domain knowledge: the range of fuel economy in mpg, not measured from the data)
+    - neighbouring relation: datasets differ by adding or removing one row (add/remove), so the number of rows is not public
 
 4. Use the following DP framework: OpenDP.
 5. Print both the true prediction and the differentially private prediction.

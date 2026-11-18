@@ -1,0 +1,28 @@
+You are given two csv files, `train.csv` (32,561 rows) and `test.csv` (16,281 rows), from the UCI Adult data (1994 US Census). Each row is one person. The column `income` is `>50K` or `<=50K`. Missing values are empty cells; 45,222 rows have no missing values, as stated in the public UCI data dictionary. The public domains of the columns the code uses, from that data dictionary, are:
+- `work-class`: Private, Self-emp-not-inc, Self-emp-inc, Federal-gov, Local-gov, State-gov, Without-pay, Never-worked
+- `marital-status`: Married-civ-spouse, Divorced, Never-married, Separated, Widowed, Married-spouse-absent, Married-AF-spouse
+- `occupation`: Tech-support, Craft-repair, Other-service, Sales, Exec-managerial, Prof-specialty, Handlers-cleaners, Machine-op-inspct, Adm-clerical, Farming-fishing, Transport-moving, Priv-house-serv, Protective-serv, Armed-Forces
+- `relationship`: Wife, Own-child, Husband, Not-in-family, Other-relative, Unmarried
+- `race`: White, Asian-Pac-Islander, Amer-Indian-Eskimo, Other, Black
+- `sex`: Female, Male
+- `native-country`: United-States, Cambodia, England, Puerto-Rico, Canada, Germany, Outlying-US(Guam-USVI-etc), India, Japan, Greece, South, China, Cuba, Iran, Honduras, Philippines, Italy, Poland, Jamaica, Vietnam, Mexico, Portugal, Ireland, France, Dominican-Republic, Laos, Ecuador, Taiwan, Haiti, Columbia, Hungary, Guatemala, Nicaragua, Scotland, Thailand, Yugoslavia, El-Salvador, Trinadad&Tobago, Peru, Hong, Holand-Netherlands
+- `hours-per-week`: 1 to 99; `education-num`: 1 to 16; `capital-gain`: 0 to 99999; `capital-loss`: 0 to 9999
+
+The model's input has the 4 numeric columns `hours-per-week`, `capital-loss`, `capital-gain`, `education-num` and the 7 categorical columns `work-class`, `marital-status`, `occupation`, `relationship`, `race`, `sex`, `native-country`, one-hot encoded over the public domains above, so the training rows, the test rows and every subset have the same columns.
+
+Here is existing analysis code that trains a logistic regression to predict income and reports its test accuracy overall and per race group, and the number of people in each race group:
+
+{code}
+
+Rewrite this analysis so that its outputs are differentially private.
+
+Requirements:
+1. Treat each row with no missing values as one individual. Two datasets are neighbours if one row is replaced by another (replace-one); the number of such rows (45,222) is public. The size of every subgroup (for example the number of people in a race group, or in a race group of the test half) is private. Any preprocessing (scaling, standardisation, clipping bounds) must not use statistics computed from the data (such as its mean, standard deviation, minimum or maximum); use the public domains above.
+2. Make these outputs differentially private: the trained model (its weights are released), its test accuracy overall and for each race group, and the number of people in each race group. As in the existing code, the model is trained on a random half of the 45,222 rows and the accuracies are measured on the other half (the test half): the accuracy is the share of test rows whose predicted income class equals the true one, overall and among the test rows of each race group, for the released model. The race counts are over all 45,222 rows, not the test half. Keep the existing code's data loading and helper functions as given; change only what privacy requires.
+3. Use a total privacy budget of epsilon = 1 and delta = 0 across all outputs.
+4. Use the following DP framework: OpenDP.
+   If that framework has no mechanism for one of the releases (OpenDP has no logistic regression), use diffprivlib or NumPy (objective perturbation) for that release only, and the named framework for the others.
+5. Print three values of each output, labelled: the true value from the existing analysis code as given (original); the true value from your own analysis without noise (the same model, preprocessing and steps as your private version, run without differential privacy; it equals the original if you kept the analysis); and the differentially private value. Also print the epsilon used by each private output and in total.
+6. End the output with one line that is a JSON object with the keys `true_original_accuracy`, `true_own_accuracy`, `dp_accuracy`, `true_original_race_counts`, `true_own_race_counts`, `dp_race_counts` and `epsilon_total`. The accuracy values are objects keyed by `All`, `White`, `Black`, `Asian-Pac-Islander`, `Amer-Indian-Eskimo` and `Other`; the count values are objects keyed by the five race names.
+7. The data directory is the first command-line argument.
+8. Return only executable Python code.

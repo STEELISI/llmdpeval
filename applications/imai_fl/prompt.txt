@@ -1,0 +1,24 @@
+You are given one file, `voters.parquet` (9,247,810 rows), from the 2008 Florida voter file (de-identified). Each row is one registered voter who reported a race. The columns are:
+- `District` (congressional district, 1 to 25), `Precinct` (voting precinct id), `Block` (Census block id). Some precincts lie in more than one district.
+- `PID`: party registration (0 = other, 1 = Democrat, 2 = Republican). `vote08`: 1 if the voter voted in the 2008 general election, else 0.
+- `SR.WHI`, `SR.BLA`, `SR.HIS`, `SR.ASI`, `SR.OTH`: self-reported race (1 = yes, 0 = no) for White, Black, Hispanic/Latino, Asian and Other. A few voters have 0 in all five.
+- `p_whi`, `p_bla`, `p_his`, `p_asi`, `p_oth`: Pr(race | surname), from the public Census surname list.
+- `r_prc_*` and `r_blk_*` (same five race suffixes): Pr(precinct | race) and Pr(block | race), from public 2010 Census tables. They are missing for a few voters with no Census match.
+- `r_pid_*` (same five suffixes): Pr(party | race), from a public table.
+The `p_*`, `r_prc_*`, `r_blk_*` and `r_pid_*` columns come from public tables and are not private. Everything else about a voter is private.
+
+Here is existing analysis code that predicts each voter's race from surname, location and party, measures how often the predictions are wrong (classification error rates), and uses the predictions to estimate turnout by race in each precinct and district, comparing them with Goodman's ecological regression and with the turnout of self-reported races:
+
+{code}
+
+Rewrite this analysis so that its outputs are differentially private.
+
+Requirements:
+1. Treat each row as one individual. Two datasets are neighbours if one row is replaced by another (replace-one); the total number of rows (9,247,810) is public. The district, precinct and block ids and the race labels are public; the number of voters in any group (race, precinct, district) is not public.
+2. Make these outputs differentially private: the classification error rates of all five predictions (Table 1), and the bias and RMSE of the turnout estimates of Goodman's regression, the name-only prediction and the Bayesian prediction for each race at precinct and district level (Table 2). Keep the existing code's data loading and helper functions as given; change only what privacy requires.
+3. Use a total privacy budget of epsilon = 1 and delta = 0 across all outputs.
+4. Use the following DP framework: OpenDP.
+5. Print three values of every Table 1 and Table 2 cell, labelled: the true value from the existing analysis code as given (original); the true value from your own analysis without noise (the same model, preprocessing and steps as your private version, run without differential privacy; it equals the original if you kept the analysis); and the differentially private value. Also print the epsilon used by each private output and in total.
+6. End the output with one line that is a JSON object with the keys `true_original_table1`, `true_own_table1`, `dp_table1`, `true_original_table2`, `true_own_table2`, `dp_table2` and `epsilon_total`. The table values have the same structure as `table1` and `table2` in the last line printed by the existing code.
+7. The data directory is the first command-line argument.
+8. Return only executable Python code.

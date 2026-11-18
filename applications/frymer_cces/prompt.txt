@@ -1,0 +1,26 @@
+You are given one csv file, `cces_white.csv` (170,299 rows), from the Cooperative Congressional Election Study (CCES) Common Content 2006-2012, white respondents only. Each row is one respondent. Missing values are empty cells. The public domains of the columns, from the replication codebook, are:
+- `racial_resentment`: an index on [0, 1], the mean of two 5-point items, so it takes the values 0, 0.125, 0.25, ..., 1
+- `union_member`, `past_union_member`: 0 or 1 (current member; former member)
+- `gender`: 1 or 2 (2 = female)
+- `famincome`: income bracket codes 1 to 18
+- `age`: years, 18 to 100
+- `educ`: education codes 1 to 6
+- `state_pre`: state FIPS code, one of the 50 states and DC: 1, 2, 4, 5, 6, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 44, 45, 46, 47, 48, 49, 50, 51, 53, 54, 55, 56
+- `year`: survey year; the rows the models use are from 2010 and 2012
+The paper reports the number of complete rows each model uses: 71,431 for model 1 and 61,463 for models 2 and 3. As in the existing code, the design matrix X of model 1 has 3 columns (constant, `union_member`, `past_union_member`); model 2 has 57 (those 3, `female` = 1 if `gender` is 2, `famincome`, `age`, `educ`, and 50 state dummies with state 1 as the reference); model 3 has 58 (model 2 plus a dummy for 2012). The group means use the rows of model 1.
+
+Here is existing analysis code that regresses racial resentment on current and past union membership in three models (bivariate; with demographic controls and state fixed effects; with year fixed effects added) and compares the mean racial resentment of union members and non-members:
+
+{code}
+
+Rewrite this analysis so that its outputs are differentially private.
+
+Requirements:
+1. Treat each row as one individual. Two datasets are neighbours if one row is replaced by another (replace-one). The number of complete rows each model uses (71,431 and 61,463) is public; no other count is public (for example the number of union members, or of respondents in a state or year). Any preprocessing (scaling, standardisation, clipping bounds) must not use statistics computed from the data (such as its mean, standard deviation, minimum or maximum); use the public domains above.
+2. Make these outputs differentially private: the coefficients of all three models with their standard errors and p-values, the R-squared of each model, the mean racial resentment of union members and of non-members, and their difference with its standard error and p-value. The standard errors and p-values must account for the differential privacy noise as well as the sampling variation. Keep the existing code's data loading and helper functions as given; change only what privacy requires.
+3. Use a total privacy budget of epsilon = 1 and delta = 0 across all outputs.
+4. Use the following DP framework: OpenDP.
+5. Print three values of each output, labelled: the true value from the existing analysis code as given (original); the true value from your own analysis without noise (the same model, preprocessing and steps as your private version, run without differential privacy; it equals the original if you kept the analysis); and the differentially private value. Also print the epsilon used by each private output and in total.
+6. End the output with one line that is a JSON object with the keys `true_original_union_coef`, `true_own_union_coef`, `dp_union_coef`, `dp_union_se`, `dp_union_p`, `true_original_group_means`, `true_own_group_means`, `dp_group_means`, `dp_diff_se`, `dp_diff_p` and `epsilon_total`. The union values are objects keyed by `model1`, `model2` and `model3` (the coefficient of `union_member`, its standard error and its p-value); the group-mean values are objects with the keys `union`, `nonunion` and `diff`.
+7. The data directory is the first command-line argument.
+8. Return only executable Python code.

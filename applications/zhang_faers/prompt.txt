@@ -1,0 +1,17 @@
+You are given two csv files from the US FDA Adverse Event Reporting System (FAERS). `reports.csv` has 432,072 rows. Each row is one adverse event report filed by a health professional in the US and received between March 11 and September 30 of 2019 or of 2020. The column `window` is the integer 2019 or 2020. The column `aes` lists the adverse events (AEs) in the report as MedDRA preferred-term IDs joined by `;` (it can be empty). `ae_terms.csv` is the public MedDRA term list (24,313 terms): `meddra_id`, `name`, `soc` (system organ class), `drop_before_test` (1 = the authors leave this term out of the analysis) and `drop_from_table` (1 = tested, but not shown in the paper's main table).
+
+Here is existing analysis code that, for each AE, compares the share of reports that list it in 2020 with the share in 2019 (2x2 table, reporting odds ratio, Fisher exact test with Bonferroni correction), and lists the Top-100 AEs:
+
+{code}
+
+Rewrite this analysis so that its outputs are differentially private.
+
+Requirements:
+1. Treat each report as one individual. Two datasets are neighbours if one report (with all of its adverse events) is replaced by another (replace-one). The total number of reports (432,072) and the term list in `ae_terms.csv` are public. The AEs to test are the listed terms with `drop_before_test` = 0, including terms that no report lists. The number of reports in each window and every AE count are not public. A report can list many AEs: keep at most K = 6 AEs per report (K is public, like epsilon; it comes from FAERS reports of other years, not from this data).
+2. Make these outputs differentially private: the 2x2 counts of each AE, its reporting odds ratio, its significance verdict, and the Top-100 list. The significance test must account for the differential privacy noise as well as the sampling variation. Keep the existing code's data loading and helper functions as given; change only what privacy requires.
+3. Use a total privacy budget of epsilon = 1 and delta = 0 across all outputs.
+4. Use the following DP framework: OpenDP.
+5. Print three versions of the results (the number of significant AEs in the main table and the Top-100 list), labelled: the true value from the existing analysis code as given (original); the true value from your own analysis without noise (the same model, preprocessing and steps as your private version, run without differential privacy; it equals the original if you kept the analysis); and the differentially private value. Also print the epsilon used by each private output and in total.
+6. End the output with one line that is a JSON object with the keys `true_original_significant`, `true_own_significant`, `dp_significant`, `true_original_top100`, `true_own_top100`, `dp_top100` and `epsilon_total`. The `true_*` and `dp_*` values are lists of MedDRA IDs (strings): the AEs of the main table (`drop_from_table` = 0) that are significant, and the Top-100 AEs.
+7. The data directory is the first command-line argument.
+8. Return only executable Python code.

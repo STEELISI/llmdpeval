@@ -1,0 +1,5 @@
+# Counts stated in the paper text
+item,value,source
+voters_with_self_reported_race,9247810,Table 1 notes
+precincts,8828,Table 2 title
+districts,25,Table 2 title

@@ -1,0 +1,138 @@
+# Retrieval dev set: DP tasks other than the 3 grid tasks (stat_count, selection_topk, ml_regression),
+# which stay held out. Each task is crossed with OpenDP / Diffprivlib / None (no framework named) = 81 queries (27 tasks).
+# Rendered into the same template as prompts/*.txt by retrieval.render_dev_prompt. Generic data, no test datasets.
+dev_sum:
+  type: Sum
+  definition: Sum a numeric column over all rows
+  columns: [hours]
+  params: mechanism = laplace, epsilon = 1, bounds = [0, 100]
+dev_mean:
+  type: Mean
+  definition: Average of a numeric column over all rows
+  columns: [age]
+  params: mechanism = laplace, epsilon = 1, bounds = [0, 120]
+dev_variance:
+  type: Variance
+  definition: Variance of a numeric column over all rows
+  columns: [score]
+  params: epsilon = 1, bounds = [0, 10]
+dev_median:
+  type: Median
+  definition: Median of a numeric column
+  columns: [salary]
+  params: mechanism = exponential, epsilon = 1, bounds = [0, 500000]
+dev_quantiles:
+  type: Quantiles
+  definition: Deciles (10th, 20th, ..., 90th percentiles) of a numeric column
+  columns: [duration]
+  params: mechanism = exponential, epsilon = 1 in total, bounds = [0, 3600]
+dev_histogram:
+  type: Histogram
+  definition: Number of rows in each category of a categorical column with a known public list of categories
+  columns: [region]
+  params: mechanism = laplace, epsilon = 1
+dev_proportion:
+  type: Proportion
+  definition: Fraction of rows where a binary column is true
+  columns: [smoker]
+  params: mechanism = laplace, epsilon = 1
+dev_argmax:
+  type: Selection
+  definition: The single most frequent category of a categorical column
+  columns: [diagnosis]
+  params: mechanism = exponential, epsilon = 1
+dev_top3:
+  type: Top-k selection
+  definition: The 3 categories with the highest mean of a bounded numeric column
+  columns: [department, rating]
+  params: mechanism = exponential, epsilon = 1 in total, rating bounds = [1, 5]
+dev_composition:
+  type: Multiple queries
+  definition: Release a count, a mean and a histogram from the same dataset under one total privacy budget
+  columns: [age, region]
+  params: epsilon = 1 in total, split across the three queries
+dev_gaussian_mean:
+  type: Mean
+  definition: Average of a numeric column under approximate differential privacy
+  columns: [blood_pressure]
+  params: mechanism = gaussian, epsilon = 1, delta = 1e-6, bounds = [50, 250]
+dev_logreg:
+  type: Logistic regression
+  definition: Train a binary classifier on numeric features and report test accuracy
+  columns: [x1, x2, x3, label]
+  params: epsilon = 1, feature bounds known from a public codebook
+dev_linreg_multi:
+  type: Linear regression
+  definition: Fit a linear model of one numeric outcome on three numeric features and report the coefficients
+  columns: [x1, x2, x3, y]
+  params: epsilon = 1, bounds known from a public codebook
+dev_pca:
+  type: PCA
+  definition: Top 2 principal components of four numeric columns
+  columns: [f1, f2, f3, f4]
+  params: epsilon = 1, row norm bounded by 1 after scaling
+dev_k_arm_proportions:
+  type: Difference in proportions
+  definition: Rate of a binary outcome in each of four arms of an experiment, and each treatment arm minus the control arm with a 95% confidence interval and p-values corrected for multiple comparisons
+  columns: [arm, responded]
+  params: mechanism = laplace, epsilon = 1, arm list known from the design
+dev_independence_test:
+  type: Independence test
+  definition: Cross-tabulate two categorical columns and test whether they are independent (chi-square test)
+  columns: [region, category]
+  params: epsilon = 1, category lists known from a public codebook
+dev_pooled_effect:
+  type: Pooled treatment effect
+  definition: Difference in mean rating between treated and control rows in each of many separate experiments, then the pooled average effect across experiments and a test of whether the effect varies between experiments
+  columns: [experiment, treated, rating]
+  params: mechanism = laplace, epsilon = 1, rating bounds = [1, 7], experiment list public
+dev_survival_curve:
+  type: Survival curve
+  definition: Survival curve per group from follow-up time and an event-or-censored flag, with at-risk and event counts per time interval
+  columns: [followup_years, died, sex]
+  params: epsilon = 1, time intervals of 1 year from 0 to a public maximum follow-up of 20 years
+dev_standardised_rates:
+  type: Rates
+  definition: Event rate per 100,000 by group and age band using public population counts, the age-standardised rate per group and the rate ratio between two groups with a confidence interval
+  columns: [region, age_band]
+  params: mechanism = laplace, epsilon = 1, population per region and age band and the standard population are public
+dev_group_quantile_gap:
+  type: Group quantiles
+  definition: 10th, 50th and 90th percentiles of a numeric column for each of two groups, the gap between the groups at each percentile and the 90/10 ratio per group
+  columns: [hourly_wage, gender]
+  params: mechanism = exponential, epsilon = 1 in total, bounds = [3, 500]
+dev_dpsgd_mlp:
+  type: Neural network classifier
+  definition: Train a small neural network (one hidden layer) to predict a binary label from numeric features with mini-batch gradient descent
+  columns: [x1, x2, x3, label]
+  params: epsilon = 1, delta = 1e-5, feature bounds known from a public codebook
+dev_group_fairness_eval:
+  type: Classifier evaluation
+  definition: Report accuracy, precision, recall and the statistical parity and equal opportunity differences between two groups for a trained binary classifier on held-out rows
+  columns: [label, prediction, group]
+  params: epsilon = 1, group list known in advance
+dev_repeated_splits:
+  type: Classifier evaluation
+  definition: Repeat a random 70/30 train/test split 20 times, train a classifier each time and report the mean and standard deviation of test accuracy
+  columns: [x1, x2, label]
+  params: epsilon = 1 in total, feature bounds known from a public codebook
+dev_random_forest:
+  type: Random forest
+  definition: Train a random forest classifier on numeric features and report test accuracy
+  columns: [x1, x2, x3, label]
+  params: epsilon = 1, feature bounds and class labels known in advance
+dev_kmeans:
+  type: Clustering
+  definition: Cluster rows into 4 groups with k-means on three numeric columns and report the cluster centres and the size of each cluster
+  columns: [f1, f2, f3]
+  params: epsilon = 1 in total, bounds known from a public codebook
+dev_marginal_tables:
+  type: Marginals
+  definition: Counts per category of three categorical columns and the two-way cross-tabulations of two column pairs, all with known public category lists, released together and made consistent with each other
+  columns: [region, sector, size_band]
+  params: mechanism = laplace, epsilon = 1 in total
+dev_synthetic_rows:
+  type: Synthetic data
+  definition: Generate a synthetic table of categorical columns (public category lists) that keeps the one-way and pairwise distributions, from noisy marginal tables only, and report the error of every one-way and two-way marginal
+  columns: [region, sector, size_band, status]
+  params: epsilon = 1 in total, number of synthetic rows = number of real rows

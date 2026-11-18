@@ -1,0 +1,5 @@
+# Imai & Khanna 2016, Figure 1 legend (p.269): AUC, 2 decimals. Rows = predictions 1, 2, 4 (Figure1.R's AUC rows).
+row,whi,bla,his
+name,0.83,0.85,0.93
+name_precinct,0.90,0.94,0.96
+name_precinct_party,0.92,0.96,0.96

@@ -1,0 +1,11 @@
+# R 3.5.1's Makeconf names the 2018 conda toolchain (x86_64-conda_cos6-linux-gnu-*); today's conda-forge
+# compilers are x86_64-conda-linux-gnu-*. Used via R_MAKEVARS_USER (set in cran_packages.R), never ~/.R.
+CC = x86_64-conda-linux-gnu-cc
+CXX = x86_64-conda-linux-gnu-c++
+CXX11 = x86_64-conda-linux-gnu-c++
+CXX14 = x86_64-conda-linux-gnu-c++
+CXX17 = x86_64-conda-linux-gnu-c++
+FC = x86_64-conda-linux-gnu-gfortran
+F77 = x86_64-conda-linux-gnu-gfortran
+# GCC >= 10 defaults to -fno-common; msm 1.6.7 (2019, needed by ltm) defines a global twice ("multiple definition of expm").
+CFLAGS = -O2 -fpic -fcommon

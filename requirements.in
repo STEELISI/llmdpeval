@@ -1,0 +1,29 @@
+# Top-level needs of llmdpeval. Compile with uv (command in the header of requirements-lock.txt); never edit the lock by hand.
+# requirements-lock.txt also pins weave==0.53.12, which the code does not import; the lock is kept as the exact
+# environment the grids ran in. Re-lock from this file only when the environment may change.
+# The `llama-index` metapackage is deliberately NOT listed: the code imports only the subpackages below, and
+# llama-index 0.14.25 pins llama-index-llms-openai<0.8 while llama-index-llms-openai-like 0.8.x needs >=0.8.
+llama-index-core==0.14.25
+llama-index-embeddings-ollama==0.10.0
+llama-index-embeddings-openai==0.6.0
+llama-index-llms-anthropic==0.12.3
+llama-index-llms-google-genai==0.11.3
+llama-index-llms-ollama==0.11.0
+llama-index-llms-openai==0.8.3
+llama-index-llms-openai-like==0.8.1
+openai==2.54.0
+
+# DP frameworks. opendp's [polars] extra pins polars==1.36.1 and adds pyarrow + randomgen (needed by dp.Context / PCA).
+opendp[polars]==0.16.0
+diffprivlib==0.6.6
+scikit-learn==1.7.2   # diffprivlib 0.6.6 breaks on >=1.8
+scipy==1.17.1         # diffprivlib 0.6.6 breaks on >=1.18
+numpy==2.4.6
+pandas==3.0.6
+
+pytest==9.1.1
+pyyaml==6.0.3
+
+# Retrieval experiments (rag eval: BM25, cross-encoder rerankers, local embedders)
+llama-index-retrievers-bm25
+sentence-transformers
