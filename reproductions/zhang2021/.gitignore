@@ -1,0 +1,7 @@
+# authors' code, Dataverse data (incl. MedDRA-licensed AE_mapping), run copies and outputs stay out of git
+original/
+data/
+work/
+outputs/
+env/py37/
+*.log

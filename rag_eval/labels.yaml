@@ -1,0 +1,130 @@
+# Relevant outlines per query: {query_id: {framework: [outline ids]}}.
+# "Relevant" = an outline a good retriever must surface for this query. hit@K counts a hit if ANY listed id is in the top K.
+# An empty list means the corpus has no outline for it (a corpus gap); those queries are skipped in scoring and listed separately.
+# None = no framework named in the prompt -> the NumPy outlines are the relevant ones.
+
+# ---- Held-out test queries (the 3 grid tasks): never tune on these ----
+stat_count:
+  OpenDP: [opendp-count-laplace, opendp-sized-vs-unsized-domains, opendp-canonical-noise-hypothesis-test, opendp-polars-conditional-sum-filter]
+  Diffprivlib: [diffprivlib-count-nonzero, diffprivlib-laplace-mechanism-direct, diffprivlib-geometric-integer-count]
+  None: [numpy-laplace-count]
+# The two-histograms rate items were added as relevant after the first labels. The task scores PROPORTIONS; the
+# older peeling items are valid DP but near-random for rates (simulation: 21% vs 100% >=3 of top 5), so both count.
+selection_topk:
+  OpenDP: [opendp-topk-rate-two-histograms]   # opendp-noisy-top-k removed from the corpus
+  Diffprivlib: [diffprivlib-topk-rate-two-histograms, diffprivlib-exponential-topk-peeling]
+  None: [numpy-topk-rate-two-histograms, numpy-topk-selection, numpy-noisy-max-score-sensitivity, numpy-groupwise-rate-noisy-ratio]
+ml_regression:
+  OpenDP: [opendp-theil-sen-linear-regression]
+  Diffprivlib: [diffprivlib-linear-regression]
+  None: [numpy-linear-regression-sufficient-stats]
+
+# ---- Dev queries (tune on these) ----
+dev_sum:
+  OpenDP: [opendp-laplace-sum-bounded, opendp-polars-context-basic]
+  Diffprivlib: [diffprivlib-sum-bounded]
+  None: [numpy-laplace-sum-bounded]
+dev_mean:
+  OpenDP: [opendp-mean-sized-bounded, opendp-mean-unknown-size-resize, opendp-polars-mean-bounded-dp]
+  Diffprivlib: [diffprivlib-mean-bounded]
+  None: [numpy-laplace-mean-bounded]
+dev_variance:
+  OpenDP: [opendp-variance-sized-bounded]
+  Diffprivlib: [diffprivlib-var-std-bounded]
+  None: [numpy-laplace-variance-bounded]
+dev_median:
+  OpenDP: [opendp-quantile-exponential, opendp-polars-quantile-median]
+  Diffprivlib: [diffprivlib-quantile-percentile-median]
+  None: [numpy-exponential-quantile]
+dev_quantiles:
+  OpenDP: [opendp-quantile-exponential, opendp-quantiles-from-histogram, opendp-polars-quantile-median]
+  Diffprivlib: [diffprivlib-quantile-percentile-median]
+  None: [numpy-exponential-quantile]
+dev_histogram:
+  OpenDP: [opendp-histogram-count-by-categories, opendp-polars-groupby-public-keys]
+  Diffprivlib: [diffprivlib-histogram-categorical]
+  None: [numpy-laplace-histogram-public-categories]
+dev_proportion:   # includes fraction-of-rows items (noisy count / public n)
+  OpenDP: [opendp-count-laplace, opendp-mean-sized-bounded, opendp-randomized-response, opendp-fraction-of-rows-public-n]
+  Diffprivlib: [diffprivlib-mean-bounded, diffprivlib-count-nonzero, diffprivlib-fraction-of-rows-public-n]
+  None: [numpy-laplace-count, numpy-laplace-mean-bounded, numpy-fraction-of-rows-public-n]
+dev_argmax:
+  OpenDP: [opendp-noisy-max-selection]
+  Diffprivlib: [diffprivlib-exponential-selection]
+  None: [numpy-exponential-selection, numpy-report-noisy-max]
+dev_top3:
+  OpenDP: [opendp-topk-count-from-histogram, opendp-topk-rate-two-histograms]   # group means = ratio of two noisy histograms
+  Diffprivlib: [diffprivlib-exponential-topk-peeling, diffprivlib-topk-joint-exponential-subsets, diffprivlib-topk-rate-two-histograms]
+  None: [numpy-topk-selection, numpy-topk-count-joint-exponential, numpy-topk-rate-two-histograms]
+dev_composition:
+  OpenDP: [opendp-composition-basic, opendp-context-compositor-framework, opendp-adaptive-composition-queryable]
+  Diffprivlib: [diffprivlib-accountant-total-budget, diffprivlib-accountant-default-context]
+  None: [numpy-composition-budget-split]
+dev_gaussian_mean:
+  OpenDP: [opendp-gaussian-zcdp-to-approx]
+  Diffprivlib: [diffprivlib-gaussian-approx-dp]
+  None: [numpy-gaussian-mechanism]
+dev_logreg:
+  OpenDP: []            # OpenDP 0.16.0 has no logistic regression (gap by design)
+  Diffprivlib: [diffprivlib-logistic-regression-public-unit-norm]   # diffprivlib-logistic-regression removed from the corpus (under-charges eps unless q = 1)
+  None: [numpy-logistic-regression-objective-perturbation, numpy-logistic-regression-output-perturbation, numpy-logistic-regression-noisy-gd]
+dev_linreg_multi:
+  OpenDP: [opendp-linear-regression-sufficient-stats-multi]   # SSP from OpenDP bounded sums (no built-in multivariate OLS in 0.16.0)
+  Diffprivlib: [diffprivlib-linear-regression]
+  None: [numpy-linear-regression-sufficient-stats]
+dev_pca:
+  OpenDP: [opendp-pca]
+  Diffprivlib: [diffprivlib-pca]
+  None: [numpy-pca-gaussian-covariance]
+dev_k_arm_proportions:
+  OpenDP: [opendp-k-arm-proportions-noise-aware]
+  Diffprivlib: [diffprivlib-k-arm-proportions-noise-aware]
+  None: [numpy-k-arm-proportions-noise-aware]
+dev_independence_test:
+  OpenDP: [opendp-rxc-independence-test-noise-aware]
+  Diffprivlib: [diffprivlib-rxc-independence-test-noise-aware]
+  None: [numpy-rxc-independence-test-noise-aware]
+dev_pooled_effect:
+  OpenDP: [opendp-pooled-effect-many-experiments]
+  Diffprivlib: [diffprivlib-pooled-effect-many-experiments]
+  None: [numpy-pooled-effect-many-experiments]
+dev_survival_curve:
+  OpenDP: [opendp-survival-curve-exit-histogram]
+  Diffprivlib: [diffprivlib-survival-curve-exit-histogram]
+  None: [numpy-survival-curve-exit-histogram]
+dev_standardised_rates:
+  OpenDP: [opendp-rates-public-denominators-standardised]
+  Diffprivlib: [diffprivlib-rates-public-denominators-standardised]
+  None: [numpy-rates-public-denominators-standardised]
+dev_group_quantile_gap:
+  OpenDP: [opendp-group-quantile-gaps-ratios, opendp-polars-groupby-median-keys]
+  Diffprivlib: [diffprivlib-group-quantile-gaps-ratios, diffprivlib-quantile-percentile-median]
+  None: [numpy-group-quantile-gaps-ratios]
+dev_dpsgd_mlp:
+  OpenDP: []   # OpenDP 0.16.0 has no gradient-based training (gap by design)
+  Diffprivlib: []   # diffprivlib 0.6.6 has no neural networks or DP-SGD (gap by design)
+  None: [numpy-dpsgd-mlp-rdp-accountant, numpy-logistic-regression-noisy-gd]
+dev_group_fairness_eval:
+  OpenDP: [opendp-group-confusion-fairness-metrics, opendp-group-rates-parity-difference]
+  Diffprivlib: [diffprivlib-group-confusion-fairness-metrics, diffprivlib-group-rates-parity-difference]
+  None: [numpy-group-confusion-fairness-metrics]
+dev_repeated_splits:
+  OpenDP: []   # OpenDP 0.16.0 has no classifiers
+  Diffprivlib: [diffprivlib-repeated-splits-disjoint-chunks]
+  None: []   # no NumPy item for this pattern
+dev_random_forest:
+  OpenDP: []   # OpenDP 0.16.0 has no tree models
+  Diffprivlib: [diffprivlib-random-forest, diffprivlib-decision-tree-classifier]
+  None: []   # no item for this framework (gap)
+dev_kmeans:
+  OpenDP: []   # OpenDP 0.16.0 has no clustering
+  Diffprivlib: [diffprivlib-kmeans-cluster-sizes, diffprivlib-kmeans]
+  None: []   # no item for this framework (gap)
+dev_marginal_tables:
+  OpenDP: [opendp-marginal-set-release, opendp-polars-groupby-public-keys]
+  Diffprivlib: [diffprivlib-marginal-set-release, diffprivlib-histogramdd-explicit-edges]
+  None: [numpy-marginals-consistent-nonnegative, numpy-marginals-contingency-tables]
+dev_synthetic_rows:
+  OpenDP: [opendp-marginal-set-release]
+  Diffprivlib: [diffprivlib-marginal-set-release]
+  None: [numpy-synthetic-data-tree-from-marginals]

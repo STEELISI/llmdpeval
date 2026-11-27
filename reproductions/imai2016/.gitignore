@@ -1,0 +1,9 @@
+# Dataverse files (academic-use-only terms: never commit or redistribute), run copies, outputs, env build
+original/
+data/
+work/
+outputs/
+env/r351/
+*.log
+logs/
+scratch/

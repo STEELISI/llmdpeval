@@ -10,7 +10,7 @@ Conditions: [`income == ">50K"`]
 Requirements:
 1. Compute the true, non-private answer to the query.
 2. Compute a differentially private version of the same query.
-3. Use the following privacy parameters: mechanism = laplace, epsilon = 1, and sensitivity = 1.
+3. Use the following privacy parameters: mechanism = laplace, epsilon = 1, and sensitivity = 1. Neighbouring datasets differ by adding or removing one row (add/remove), so the number of rows is not public.
 4. Use the following DP framework: OpenDP.
 5. Print the true answer and the private answer.
 6. Return only executable Python code.

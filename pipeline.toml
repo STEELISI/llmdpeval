@@ -1,0 +1,36 @@
+# The generation pipeline settings, in one place. helper.py, retrieval.py and run_grid.py read their defaults
+# from here; run_grid flags still override. run_grid saves the resolved settings, the corpus and theory hashes,
+# the git commit and the lock-file hash in <grid_dir>/pipeline_frozen.json, and refuses to continue a grid whose
+# frozen settings differ. Change a value here only between grids.
+
+# Retrieval
+embedder = "qwen3-embedding:4b"        # helper.EMBED_MODELS key; the index is rebuilt when it changes
+rag_k = [3]                         # K values offered as conditions (<framework>-rag-k<K>); K = outlines per release;
+                                    # add 1 (rag_k = [1, 3]) to offer the -rag-k1 conditions
+query = "fields"                       # retrieval query: will (Query type + definition) | full | fields
+filter = "framework"                   # metadata filter on retrieval: none | framework
+
+# Prompt
+template = "guided"                    # guided | plain
+theory = true                         # add one theory card to RAG prompts (--theory)
+code = true                           # follow each outline with its verified code skeleton (--code)
+holdout = false                        # with code: hide the grid tasks' own skeletons (--holdout)
+
+# Generation
+models = ["gemma4:latest", "granite4.2:30b", "qwen3.6:27b", "qwen3:32b", "qwen3.6:35b"]
+conditions = ["None", "Diffprivlib", "OpenDP", "None-rag-k3", "Diffprivlib-rag-k3", "OpenDP-rag-k3"]
+runs = 4
+sampled_temperature = 0.7              # run 1 of each cell uses temperature 0, runs 2..N use this
+think = "on"                             # "" = unset (OpenAI-style /api path), "on" or "off" (Ollama-native endpoint)
+repair = 0                             # inline repair rounds during generation. 0: generation (XDC) never runs
+                                       # code; repair is a separate step on the evaluation node, 2 rounds:
+                                       # python -m llmdpeval.repair SRC_GRID OUT_GRID --rounds 2
+reask = false                          # re-ask once when an answer has no code
+max_output_tokens = 4096               # hosted APIs and local Ollama
+sphere_max_output_tokens = 32768       # reasoning tokens count as output; paper-app answers need the room
+
+# Timeouts in seconds
+sphere_timeout = 1800                  # client timeout for sphere-llm calls (qwen3.6 can reason past 10 min)
+ollama_timeout = 600                   # local Ollama
+embed_timeout = 600                    # sphere embeddings; long because generation calls can hold the shared GPU
+hard_cap = 1800                        # wall-clock cap per generation in run_grid

@@ -10,14 +10,14 @@ Queries:
     - count of rows where `income == ">50K"`
     - average `age`
     - average `age` where `income == ">50K"`
-    - number of rows where `income == ">50K" and education == "Master"`
-    - average `age` where `income == ">50K" and education == "Master"`
+    - number of rows where `income == ">50K" and education == "Masters"`
+    - average `age` where `income == ">50K" and education == "Masters"`
 
 
 Requirements:
 1. Compute the true, non-private answer for each query.
 2. Compute a differentially private answer for each query.
-3. Use the following privacy parameters: mechanism = laplace, epsilon = 1 (total), and age bounds = [18, 100].
+3. Use the following privacy parameters: mechanism = laplace, epsilon = 1 (total), and age bounds = [18, 100]. Neighbouring datasets differ by adding or removing one row (add/remove), so the number of rows is not public.
 4. Use the following DP framework: OpenDP.
 5. Print the true and differentially private answers for each query.
 6. Return only executable Python code.

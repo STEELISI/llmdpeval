@@ -1,0 +1,64 @@
+# R environment for Frymer & Grumbach (AJPS 2021). The authors ran R 3.5.1 (Readme).
+# conda-forge has R 3.5.1 builds for every package below; mediation and rgenoud do not,
+# so cran_packages.R installs those (and 3 CRAN-only packages) from a dated CRAN snapshot.
+name: frymer2021
+channels: [conda-forge]
+dependencies:
+  - r-base=3.5.1
+  - r-foreign
+  - r-readstata13
+  - r-plyr
+  - r-broom
+  - r-matching
+  - r-reshape2
+  - r-stargazer
+  - r-haven
+  - r-ggplot2
+  - r-arm
+  - r-lme4
+  - r-car
+  - r-zoo
+  - r-mass
+  - r-sandwich
+  - r-mvtnorm
+  - r-lpsolve
+  # Compiled dependencies of the CRAN-snapshot packages: today's compilers can't build their 2019 sources,
+  # so they come prebuilt for R 3.5.1 from conda-forge.
+  - r-survival
+  - r-rpart
+  - r-cluster
+  - r-jsonlite
+  - r-maps
+  - r-httpuv
+  - r-dotcall64
+  - r-spam
+  - r-fields
+  - r-hmisc
+  - r-rgl
+  - r-shiny
+  - r-knitr
+  - r-htmltools
+  - r-htmlwidgets
+  - r-htmltable
+  - r-viridis
+  - r-lazyeval
+  - r-yaml
+  - r-mime
+  - r-checkmate
+  - r-acepack
+  - r-base64enc
+  - r-markdown
+  - r-later
+  - r-promises
+  - r-webshot
+  - r-sourcetools
+  - r-crosstalk
+  - r-miniui
+  - r-manipulatewidget
+  # libGL for rgl (imported by LMERConvenienceFunctions); found via env/activate-gl.sh
+  - libglvnd-glx-cos7-x86_64
+  - mesa-libgl-cos7-x86_64
+  - c-compiler
+  - cxx-compiler
+  - fortran-compiler
+  - make

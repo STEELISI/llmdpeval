@@ -1,0 +1,465 @@
+# OpenDP 0.16.0 public callables: module.name(signature). Classes list public methods.
+# Import as `import opendp.prelude as dp`; dp.t = transformations, dp.m = measurements, dp.c = combinators.
+
+## opendp.prelude
+
+## opendp.mod
+opendp.mod.ApproximateDivergence(...)
+opendp.mod.AtomDomain(...)
+opendp.mod.ChangeOneIdDistance(...)
+opendp.mod.Domain(...)
+    opendp.mod.Domain.cast(self, type_: 'Type[D]') -> 'D'
+    opendp.mod.Domain.member(self, val) -> 'bool'
+opendp.mod.ExtrinsicDivergence(...)
+opendp.mod.ExtrinsicDomain(...)
+opendp.mod.FrameDistance(...)
+opendp.mod.Function(...)
+opendp.mod.LazyFrameDomain(...)
+    opendp.mod.LazyFrameDomain.get_margin(self, by: 'Sequence[Any]')
+    opendp.mod.LazyFrameDomain.get_series_domain(self, name: 'str') -> 'SeriesDomain'
+opendp.mod.Measure(...)
+    opendp.mod.Measure.cast(self, type_: 'Type[D]') -> 'D'
+opendp.mod.Measurement(...)
+    opendp.mod.Measurement.check(self, d_in, d_out, *, debug=False) -> 'bool'
+    opendp.mod.Measurement.invoke(self, arg)
+    opendp.mod.Measurement.map(self, d_in)
+opendp.mod.Metric(...)
+    opendp.mod.Metric.cast(self, type_: 'Type[D]') -> 'D'
+opendp.mod.Odometer(...)
+    opendp.mod.Odometer.invoke(self, arg)
+opendp.mod.OdometerQueryable(value)
+    opendp.mod.OdometerQueryable.invoke(self, query)
+    opendp.mod.OdometerQueryable.privacy_loss(self, d_in)
+opendp.mod.OpenDPException(variant: 'str', message: 'Optional[str]' = None, raw_traceback: 'Optional[str]' = None)
+opendp.mod.OptionDomain(...)
+opendp.mod.PrivacyProfile(curve)
+    opendp.mod.PrivacyProfile.delta(self, epsilon)
+    opendp.mod.PrivacyProfile.epsilon(self, delta)
+opendp.mod.Queryable(value, query_type)
+opendp.mod.SeriesDomain(...)
+opendp.mod.SymmetricIdDistance(...)
+opendp.mod.Transformation(...)
+    opendp.mod.Transformation.check(self, d_in, d_out, *, debug=False) -> 'bool'
+    opendp.mod.Transformation.invoke(self, arg)
+    opendp.mod.Transformation.map(self, d_in)
+opendp.mod.UnknownTypeException(...)
+opendp.mod.VectorDomain(...)
+opendp.mod.assert_features(*features: 'str') -> 'None'
+opendp.mod.binary_search(predicate: 'Callable[[float], bool]', bounds: 'tuple[float | None, float | None] | None' = (None, None), T: 'Type[float] | None' = None, return_sign: 'bool' = False) -> 'float | tuple[float, int]'
+opendp.mod.binary_search_chain(make_chain: 'Callable[[float], M]', d_in: 'Any', d_out: 'Any', bounds: 'tuple[float | None, float | None] | None' = (None, None), T=None) -> 'M'
+opendp.mod.binary_search_param(make_chain: 'Callable[[float], Union[Transformation, Measurement]]', d_in: 'Any', d_out: 'Any', bounds: 'tuple[float | None, float | None] | None' = (None, None), T=None) -> 'float'
+opendp.mod.deserialize(dp_json)
+opendp.mod.disable_features(*features: 'str') -> 'None'
+opendp.mod.enable_features(*features: 'str') -> 'None'
+opendp.mod.exponential_bounds_search(predicate: 'Callable[[float], bool]', T: 'Optional[Union[Type[float], Type[int]]]') -> 'Optional[tuple[float, float]]'
+opendp.mod.serialize(dp_obj)
+
+## opendp.context
+opendp.context.Chain(*args, **kwargs)
+opendp.context.Context(accountant: opendp.mod.Measurement, queryable: opendp.mod.Queryable, d_in: Union[float, Sequence[opendp.extras.polars.Bound]], d_mids: Union[list[float], list[tuple[float, float]], NoneType] = None, d_out: Union[float, tuple[float, float], NoneType] = None, query_space: Optional[tuple[opendp.mod.Domain, opendp.mod.Metric]] = None)
+    opendp.context.Context.compositor(data: Any, privacy_unit: tuple[opendp.mod.Metric, typing.Union[float, typing.Sequence[opendp.extras.polars.Bound]]], privacy_loss: tuple[opendp.mod.Measure, typing.Any], split_evenly_over: Optional[int] = None, split_by_weights: Optional[Sequence[float]] = None, domain: Optional[opendp.mod.Domain] = None, margins: Optional[Sequence[opendp.extras.polars.Margin]] = None) -> 'Context'
+    opendp.context.Context.current_privacy_loss(self)
+    opendp.context.Context.deserialize_polars_plan(self, serialized_plan: bytes) -> 'LazyFrameQuery'
+    opendp.context.Context.query(self, **kwargs) -> Union[ForwardRef('Query'), opendp.extras.polars.LazyFrameQuery]
+    opendp.context.Context.remaining_privacy_loss(self)
+opendp.context.PartialChain(f, *args, **kwargs)
+    opendp.context.PartialChain.fix(self, d_in: Union[float, Sequence[opendp.extras.polars.Bound]], d_out: Union[float, tuple[float, float]], output_measure: Optional[opendp.mod.Measure] = None, bounds: Optional[tuple[float, float]] = None, T=None)
+opendp.context.Query(chain: Union[tuple[opendp.mod.Domain, opendp.mod.Metric], opendp.mod.Transformation, opendp.mod.Measurement, opendp.mod.Odometer, ForwardRef('PartialChain')], output_measure: opendp.mod.Measure, d_in: Union[float, Sequence[opendp.extras.polars.Bound], NoneType] = None, d_out: Union[float, tuple[float, float], NoneType] = None, context: Optional[ForwardRef('Context')] = None, _wrap_release=None) -> None
+    opendp.context.Query.compositor(self, split_evenly_over: Optional[int] = None, split_by_weights: Optional[Sequence[float]] = None, d_out: Union[float, tuple[float, float], NoneType] = None, output_measure: Optional[opendp.mod.Measure] = None, alpha: Optional[float] = None) -> 'Query'
+    opendp.context.Query.new_with(self, *, chain: Union[tuple[opendp.mod.Domain, opendp.mod.Metric], opendp.mod.Transformation, opendp.mod.Measurement, opendp.mod.Odometer, ForwardRef('PartialChain')], wrap_release=None) -> 'Query'
+    opendp.context.Query.param(self, allow_transformations=False, bounds: Optional[tuple[float, float]] = None, T: Union[Type[float], Type[int], NoneType] = None)
+    opendp.context.Query.release(self, data=None, bounds: Optional[tuple[float, float]] = None, T: Union[Type[float], Type[int], NoneType] = None)
+    opendp.context.Query.resolve(self, allow_transformations: bool = False, bounds: Optional[tuple[float, float]] = None, T: Union[Type[float], Type[int], NoneType] = None) -> Union[opendp.mod.Transformation, opendp.mod.Measurement, opendp.mod.Odometer]
+opendp.context.domain_of(T, infer: bool = False) -> opendp.mod.Domain
+opendp.context.loss_of(epsilon: Optional[float] = None, delta: Optional[float] = None, rho: Optional[float] = None) -> tuple[opendp.mod.Measure, typing.Union[float, tuple[float, float]]]
+opendp.context.metric_of(M) -> opendp.mod.Metric
+opendp.context.register(constructor: Callable[..., Union[opendp.mod.Transformation, opendp.mod.Measurement]], name: Optional[str] = None)
+opendp.context.space_of(T, M=None, infer: bool = False) -> tuple[opendp.mod.Domain, opendp.mod.Metric]
+opendp.context.unit_of(*, contributions: Union[int, Sequence[opendp.extras.polars.Bound], NoneType] = None, changes: Optional[int] = None, absolute: Optional[float] = None, l1: Optional[float] = None, l2: Optional[float] = None, local: Optional[bool] = None, identifier: Optional[str] = None, ordered: bool = False, U=None) -> tuple[opendp.mod.Metric, typing.Union[float, typing.Sequence[opendp.extras.polars.Bound]]]
+
+## opendp.measurements
+opendp.measurements.debias_randomized_response_bitvec(answers, f: float)
+opendp.measurements.make_alp_queryable(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, scale: float, total_limit, value_limit=None, size_factor=50, alpha=4) -> opendp.mod.Measurement
+opendp.measurements.make_canonical_noise(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, d_in: float, d_out: tuple[typing.Any, typing.Any]) -> opendp.mod.Measurement
+opendp.measurements.make_gaussian(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, scale: float, k=None, MO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'ZeroConcentratedDivergence') -> opendp.mod.Measurement
+opendp.measurements.make_gaussian_threshold(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, scale: float, threshold, k=None, MO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'Approximate<ZeroConcentratedDivergence>') -> opendp.mod.Measurement
+opendp.measurements.make_geometric(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, scale: float, bounds=None, MO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'MaxDivergence') -> opendp.mod.Measurement
+opendp.measurements.make_laplace(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, scale: float, k=None, MO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'MaxDivergence') -> opendp.mod.Measurement
+opendp.measurements.make_laplace_threshold(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, scale: float, threshold, k=None, MO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'Approximate<MaxDivergence>') -> opendp.mod.Measurement
+opendp.measurements.make_noise(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, output_measure: opendp.mod.Measure, scale: float, k=None) -> opendp.mod.Measurement
+opendp.measurements.make_noise_threshold(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, output_measure: opendp.mod.Measure, scale: float, threshold, k=None) -> opendp.mod.Measurement
+opendp.measurements.make_noisy_max(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, output_measure: opendp.mod.Measure, scale: float, negate: bool = False) -> opendp.mod.Measurement
+opendp.measurements.make_noisy_top_k(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, output_measure: opendp.mod.Measure, k: int, scale: float, negate: bool = False) -> opendp.mod.Measurement
+opendp.measurements.make_private_expr(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, output_measure: opendp.mod.Measure, expr, global_scale=None) -> opendp.mod.Measurement
+opendp.measurements.make_private_lazyframe(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, output_measure: opendp.mod.Measure, lazyframe, global_scale=None, threshold=None) -> opendp.mod.Measurement
+opendp.measurements.make_private_quantile(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, output_measure: opendp.mod.Measure, candidates, alpha: float, scale: float) -> opendp.mod.Measurement
+opendp.measurements.make_randomized_response(categories, prob: float, T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None) -> opendp.mod.Measurement
+opendp.measurements.make_randomized_response_bitvec(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, f: float, constant_time: bool = False) -> opendp.mod.Measurement
+opendp.measurements.make_randomized_response_bool(prob: float, constant_time: bool = False) -> opendp.mod.Measurement
+opendp.measurements.make_report_noisy_max_gumbel(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, scale: float, optimize: str = 'max') -> opendp.mod.Measurement
+opendp.measurements.make_user_measurement(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, output_measure: opendp.mod.Measure, function, privacy_map, TO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'ExtrinsicObject') -> opendp.mod.Measurement
+opendp.measurements.then_alp_queryable(scale: float, total_limit, value_limit=None, size_factor=50, alpha=4)
+opendp.measurements.then_canonical_noise(d_in: float, d_out: tuple[typing.Any, typing.Any])
+opendp.measurements.then_gaussian(scale: float, k=None, MO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'ZeroConcentratedDivergence')
+opendp.measurements.then_gaussian_threshold(scale: float, threshold, k=None, MO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'Approximate<ZeroConcentratedDivergence>')
+opendp.measurements.then_geometric(scale: float, bounds=None, MO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'MaxDivergence')
+opendp.measurements.then_laplace(scale: float, k=None, MO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'MaxDivergence')
+opendp.measurements.then_laplace_threshold(scale: float, threshold, k=None, MO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'Approximate<MaxDivergence>')
+opendp.measurements.then_noise(output_measure: opendp.mod.Measure, scale: float, k=None)
+opendp.measurements.then_noise_threshold(output_measure: opendp.mod.Measure, scale: float, threshold, k=None)
+opendp.measurements.then_noisy_max(output_measure: opendp.mod.Measure, scale: float, negate: bool = False)
+opendp.measurements.then_noisy_top_k(output_measure: opendp.mod.Measure, k: int, scale: float, negate: bool = False)
+opendp.measurements.then_private_expr(output_measure: opendp.mod.Measure, expr, global_scale=None)
+opendp.measurements.then_private_lazyframe(output_measure: opendp.mod.Measure, lazyframe, global_scale=None, threshold=None)
+opendp.measurements.then_private_quantile(output_measure: opendp.mod.Measure, candidates, alpha: float, scale: float)
+opendp.measurements.then_randomized_response_bitvec(f: float, constant_time: bool = False)
+opendp.measurements.then_report_noisy_max_gumbel(scale: float, optimize: str = 'max')
+opendp.measurements.then_user_measurement(output_measure: opendp.mod.Measure, function, privacy_map, TO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'ExtrinsicObject')
+
+## opendp.transformations
+opendp.transformations.choose_branching_factor(size_guess: int) -> int
+opendp.transformations.make_b_ary_tree(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, leaf_count: int, branching_factor: int) -> opendp.mod.Transformation
+opendp.transformations.make_bounded_float_checked_sum(size_limit: int, bounds: tuple[typing.Any, typing.Any], S: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'Pairwise<T>') -> opendp.mod.Transformation
+opendp.transformations.make_bounded_float_ordered_sum(size_limit: int, bounds: tuple[typing.Any, typing.Any], S: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'Pairwise<T>') -> opendp.mod.Transformation
+opendp.transformations.make_bounded_int_monotonic_sum(bounds: tuple[typing.Any, typing.Any], T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None) -> opendp.mod.Transformation
+opendp.transformations.make_bounded_int_ordered_sum(bounds: tuple[typing.Any, typing.Any], T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None) -> opendp.mod.Transformation
+opendp.transformations.make_bounded_int_split_sum(bounds: tuple[typing.Any, typing.Any], T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None) -> opendp.mod.Transformation
+opendp.transformations.make_cast(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, TOA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias]) -> opendp.mod.Transformation
+opendp.transformations.make_cast_default(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, TOA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias]) -> opendp.mod.Transformation
+opendp.transformations.make_cast_inherent(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, TOA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias]) -> opendp.mod.Transformation
+opendp.transformations.make_cdf(TA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'float') -> opendp.mod.Function
+opendp.transformations.make_clamp(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, bounds: tuple[typing.Any, typing.Any]) -> opendp.mod.Transformation
+opendp.transformations.make_consistent_b_ary_tree(branching_factor: int, TIA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'int', TOA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'float') -> opendp.mod.Function
+opendp.transformations.make_count(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, TO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'int') -> opendp.mod.Transformation
+opendp.transformations.make_count_by(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, TV: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'int') -> opendp.mod.Transformation
+opendp.transformations.make_count_by_categories(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, categories, null_category: bool = True, MO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'L1Distance<int>', TOA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'int') -> opendp.mod.Transformation
+opendp.transformations.make_count_distinct(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, TO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'int') -> opendp.mod.Transformation
+opendp.transformations.make_create_dataframe(col_names, K: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None) -> opendp.mod.Transformation
+opendp.transformations.make_df_cast_default(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, column_name, TIA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias], TOA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias]) -> opendp.mod.Transformation
+opendp.transformations.make_df_is_equal(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, column_name, value, TIA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None) -> opendp.mod.Transformation
+opendp.transformations.make_drop_null(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric) -> opendp.mod.Transformation
+opendp.transformations.make_find(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, categories) -> opendp.mod.Transformation
+opendp.transformations.make_find_bin(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, edges) -> opendp.mod.Transformation
+opendp.transformations.make_identity(domain: opendp.mod.Domain, metric: opendp.mod.Metric) -> opendp.mod.Transformation
+opendp.transformations.make_impute_constant(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, constant) -> opendp.mod.Transformation
+opendp.transformations.make_impute_uniform_float(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, bounds: tuple[typing.Any, typing.Any]) -> opendp.mod.Transformation
+opendp.transformations.make_index(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, categories, null, TOA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None) -> opendp.mod.Transformation
+opendp.transformations.make_is_equal(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, value) -> opendp.mod.Transformation
+opendp.transformations.make_is_null(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric) -> opendp.mod.Transformation
+opendp.transformations.make_lipschitz_float_mul(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, constant, bounds: tuple[typing.Any, typing.Any]) -> opendp.mod.Transformation
+opendp.transformations.make_mean(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric) -> opendp.mod.Transformation
+opendp.transformations.make_metric_bounded(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric) -> opendp.mod.Transformation
+opendp.transformations.make_metric_unbounded(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric) -> opendp.mod.Transformation
+opendp.transformations.make_ordered_random(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric) -> opendp.mod.Transformation
+opendp.transformations.make_quantile_score_candidates(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, candidates, alpha: float) -> opendp.mod.Transformation
+opendp.transformations.make_quantiles_from_counts(bin_edges, alphas, interpolation: str = 'linear', TA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None, F: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'float') -> opendp.mod.Function
+opendp.transformations.make_resize(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, size: int, constant, MO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'SymmetricDistance') -> opendp.mod.Transformation
+opendp.transformations.make_select_column(key, TOA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias], K: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None) -> opendp.mod.Transformation
+opendp.transformations.make_sized_bounded_float_checked_sum(size: int, bounds: tuple[typing.Any, typing.Any], S: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'Pairwise<T>') -> opendp.mod.Transformation
+opendp.transformations.make_sized_bounded_float_ordered_sum(size: int, bounds: tuple[typing.Any, typing.Any], S: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'Pairwise<T>') -> opendp.mod.Transformation
+opendp.transformations.make_sized_bounded_int_checked_sum(size: int, bounds: tuple[typing.Any, typing.Any], T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None) -> opendp.mod.Transformation
+opendp.transformations.make_sized_bounded_int_monotonic_sum(size: int, bounds: tuple[typing.Any, typing.Any], T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None) -> opendp.mod.Transformation
+opendp.transformations.make_sized_bounded_int_ordered_sum(size: int, bounds: tuple[typing.Any, typing.Any], T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None) -> opendp.mod.Transformation
+opendp.transformations.make_sized_bounded_int_split_sum(size: int, bounds: tuple[typing.Any, typing.Any], T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None) -> opendp.mod.Transformation
+opendp.transformations.make_split_dataframe(separator: str, col_names, K: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None) -> opendp.mod.Transformation
+opendp.transformations.make_split_lines() -> opendp.mod.Transformation
+opendp.transformations.make_split_records(separator: str) -> opendp.mod.Transformation
+opendp.transformations.make_stable_expr(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, expr) -> opendp.mod.Transformation
+opendp.transformations.make_stable_lazyframe(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, lazyframe, MO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'MI') -> opendp.mod.Transformation
+opendp.transformations.make_subset_by(indicator_column, keep_columns, TK: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None) -> opendp.mod.Transformation
+opendp.transformations.make_sum(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric) -> opendp.mod.Transformation
+opendp.transformations.make_sum_of_squared_deviations(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, S: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'Pairwise<T>') -> opendp.mod.Transformation
+opendp.transformations.make_unordered(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric) -> opendp.mod.Transformation
+opendp.transformations.make_user_transformation(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, output_domain: opendp.mod.Domain, output_metric: opendp.mod.Metric, function, stability_map) -> opendp.mod.Transformation
+opendp.transformations.make_variance(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, ddof: int = 1, S: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'Pairwise<T>') -> opendp.mod.Transformation
+opendp.transformations.then_b_ary_tree(leaf_count: int, branching_factor: int)
+opendp.transformations.then_cast(TOA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias])
+opendp.transformations.then_cast_default(TOA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias])
+opendp.transformations.then_cast_inherent(TOA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias])
+opendp.transformations.then_clamp(bounds: tuple[typing.Any, typing.Any])
+opendp.transformations.then_count(TO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'int')
+opendp.transformations.then_count_by(TV: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'int')
+opendp.transformations.then_count_by_categories(categories, null_category: bool = True, MO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'L1Distance<int>', TOA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'int')
+opendp.transformations.then_count_distinct(TO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'int')
+opendp.transformations.then_df_cast_default(column_name, TIA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias], TOA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias])
+opendp.transformations.then_df_is_equal(column_name, value, TIA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None)
+opendp.transformations.then_drop_null()
+opendp.transformations.then_find(categories)
+opendp.transformations.then_find_bin(edges)
+opendp.transformations.then_identity()
+opendp.transformations.then_impute_constant(constant)
+opendp.transformations.then_impute_uniform_float(bounds: tuple[typing.Any, typing.Any])
+opendp.transformations.then_index(categories, null, TOA: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None)
+opendp.transformations.then_is_equal(value)
+opendp.transformations.then_is_null()
+opendp.transformations.then_lipschitz_float_mul(constant, bounds: tuple[typing.Any, typing.Any])
+opendp.transformations.then_mean()
+opendp.transformations.then_metric_bounded()
+opendp.transformations.then_metric_unbounded()
+opendp.transformations.then_ordered_random()
+opendp.transformations.then_quantile_score_candidates(candidates, alpha: float)
+opendp.transformations.then_resize(size: int, constant, MO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'SymmetricDistance')
+opendp.transformations.then_stable_expr(expr)
+opendp.transformations.then_stable_lazyframe(lazyframe, MO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'MI')
+opendp.transformations.then_sum()
+opendp.transformations.then_sum_of_squared_deviations(S: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'Pairwise<T>')
+opendp.transformations.then_unordered()
+opendp.transformations.then_variance(ddof: int = 1, S: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'Pairwise<T>')
+
+## opendp.combinators
+opendp.combinators.make_adaptive_composition(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, output_measure: opendp.mod.Measure, d_in, d_mids) -> opendp.mod.Measurement
+opendp.combinators.make_approximate(measurement: opendp.mod.Measurement) -> opendp.mod.Measurement
+opendp.combinators.make_basic_composition(measurements) -> opendp.mod.Measurement
+opendp.combinators.make_chain_mt(measurement1: opendp.mod.Measurement, transformation0: opendp.mod.Transformation) -> opendp.mod.Measurement
+opendp.combinators.make_chain_pm(postprocess1: opendp.mod.Function, measurement0: opendp.mod.Measurement) -> opendp.mod.Measurement
+opendp.combinators.make_chain_tt(transformation1: opendp.mod.Transformation, transformation0: opendp.mod.Transformation) -> opendp.mod.Transformation
+opendp.combinators.make_composition(measurements) -> opendp.mod.Measurement
+opendp.combinators.make_fix_delta(measurement: opendp.mod.Measurement, delta: float) -> opendp.mod.Measurement
+opendp.combinators.make_fixed_approxDP_to_approxDP(measurement: opendp.mod.Measurement) -> opendp.mod.Measurement
+opendp.combinators.make_fully_adaptive_composition(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, output_measure: opendp.mod.Measure) -> opendp.mod.Odometer
+opendp.combinators.make_population_amplification(measurement: opendp.mod.Measurement, population_size: int) -> opendp.mod.Measurement
+opendp.combinators.make_privacy_filter(odometer: opendp.mod.Odometer, d_in, d_out) -> opendp.mod.Measurement
+opendp.combinators.make_pureDP_to_zCDP(measurement: opendp.mod.Measurement) -> opendp.mod.Measurement
+opendp.combinators.make_select_private_candidate(measurement: opendp.mod.Measurement, stop_probability: float, threshold: float) -> opendp.mod.Measurement
+opendp.combinators.make_sequential_composition(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, output_measure: opendp.mod.Measure, d_in, d_mids) -> opendp.mod.Measurement
+opendp.combinators.make_zCDP_to_approxDP(measurement: opendp.mod.Measurement) -> opendp.mod.Measurement
+opendp.combinators.then_adaptive_composition(output_measure: opendp.mod.Measure, d_in, d_mids)
+opendp.combinators.then_fully_adaptive_composition(output_measure: opendp.mod.Measure)
+opendp.combinators.then_sequential_composition(output_measure: opendp.mod.Measure, d_in, d_mids)
+
+## opendp.domains
+opendp.domains.array_domain(element_domain: opendp.mod.Domain, width: int) -> opendp.mod.Domain
+opendp.domains.atom_domain(bounds=None, nan=None, T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None) -> opendp.mod.AtomDomain
+opendp.domains.bitvector_domain(max_weight=None) -> opendp.mod.Domain
+opendp.domains.categorical_domain(categories=None) -> opendp.mod.Domain
+opendp.domains.datetime_domain(time_unit: str = 'us', time_zone: Optional[str] = None) -> opendp.mod.Domain
+opendp.domains.domain_carrier_type(this: opendp.mod.Domain) -> str
+opendp.domains.domain_debug(this: opendp.mod.Domain) -> str
+opendp.domains.domain_type(this: opendp.mod.Domain) -> str
+opendp.domains.enum_domain(categories) -> opendp.mod.Domain
+opendp.domains.lazyframe_domain(series_domains) -> opendp.mod.LazyFrameDomain
+opendp.domains.map_domain(key_domain: opendp.mod.Domain, value_domain: opendp.mod.Domain) -> opendp.mod.Domain
+opendp.domains.option_domain(element_domain: opendp.mod.Domain, D: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None) -> opendp.mod.OptionDomain
+opendp.domains.series_domain(name: str, element_domain: opendp.mod.Domain) -> opendp.mod.SeriesDomain
+opendp.domains.user_domain(identifier: str, member, descriptor=None) -> opendp.mod.Domain
+opendp.domains.vector_domain(atom_domain: opendp.mod.Domain, size=None) -> opendp.mod.VectorDomain
+opendp.domains.wild_expr_domain(columns, margin=None) -> opendp.mod.Domain
+opendp.domains.with_margin(frame_domain: opendp.mod.Domain, margin) -> opendp.mod.LazyFrameDomain
+
+## opendp.metrics
+opendp.metrics.absolute_distance(T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias]) -> opendp.mod.Metric
+opendp.metrics.change_one_distance() -> opendp.mod.Metric
+opendp.metrics.change_one_id_distance(identifier) -> opendp.mod.ChangeOneIdDistance
+opendp.metrics.discrete_distance() -> opendp.mod.Metric
+opendp.metrics.frame_distance(inner_metric: opendp.mod.Metric) -> opendp.mod.Metric
+opendp.metrics.hamming_distance() -> opendp.mod.Metric
+opendp.metrics.insert_delete_distance() -> opendp.mod.Metric
+opendp.metrics.l01inf_distance(metric: opendp.mod.Metric) -> opendp.mod.Metric
+opendp.metrics.l02inf_distance(metric: opendp.mod.Metric) -> opendp.mod.Metric
+opendp.metrics.l1_distance(T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias]) -> opendp.mod.Metric
+opendp.metrics.l2_distance(T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias]) -> opendp.mod.Metric
+opendp.metrics.linf_distance(T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias], monotonic: bool = False) -> opendp.mod.Metric
+opendp.metrics.metric_debug(this: opendp.mod.Metric) -> str
+opendp.metrics.metric_distance_type(this: opendp.mod.Metric) -> str
+opendp.metrics.metric_type(this: opendp.mod.Metric) -> str
+opendp.metrics.symmetric_distance() -> opendp.mod.Metric
+opendp.metrics.symmetric_id_distance(identifier) -> opendp.mod.SymmetricIdDistance
+opendp.metrics.user_distance(identifier: str, descriptor=None) -> opendp.mod.Metric
+
+## opendp.measures
+opendp.measures.approximate(measure: opendp.mod.Measure) -> opendp.mod.ApproximateDivergence
+opendp.measures.fixed_smoothed_max_divergence() -> opendp.mod.Measure
+opendp.measures.max_divergence() -> opendp.mod.Measure
+opendp.measures.measure_debug(this: opendp.mod.Measure) -> str
+opendp.measures.measure_distance_type(this: opendp.mod.Measure) -> str
+opendp.measures.measure_type(this: opendp.mod.Measure) -> str
+opendp.measures.new_privacy_profile(curve)
+opendp.measures.renyi_divergence() -> opendp.mod.Measure
+opendp.measures.smoothed_max_divergence() -> opendp.mod.Measure
+opendp.measures.user_divergence(identifier: str, descriptor=None) -> opendp.mod.Measure
+opendp.measures.zero_concentrated_divergence() -> opendp.mod.Measure
+
+## opendp.accuracy
+opendp.accuracy.accuracy_to_discrete_gaussian_scale(accuracy, alpha, T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None)
+opendp.accuracy.accuracy_to_discrete_laplacian_scale(accuracy, alpha, T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None)
+opendp.accuracy.accuracy_to_gaussian_scale(accuracy, alpha, T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None)
+opendp.accuracy.accuracy_to_laplacian_scale(accuracy, alpha, T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None)
+opendp.accuracy.discrete_gaussian_scale_to_accuracy(scale, alpha, T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None)
+opendp.accuracy.discrete_laplacian_scale_to_accuracy(scale, alpha, T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None)
+opendp.accuracy.gaussian_scale_to_accuracy(scale, alpha, T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None)
+opendp.accuracy.laplacian_scale_to_accuracy(scale, alpha, T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None)
+opendp.accuracy.summarize_polars_measurement(measurement: opendp.mod.Measurement, alpha=None)
+
+## opendp.extras.numpy
+opendp.extras.numpy.Domain(...)
+    opendp.extras.numpy.Domain.cast(self, type_: 'Type[D]') -> 'D'
+    opendp.extras.numpy.Domain.member(self, val) -> 'bool'
+opendp.extras.numpy.Literal(*args, **kwds)
+opendp.extras.numpy.NPArray2Domain(*, origin: 'numpy.ndarray | None', norm: 'float | None', p: 'Literal[1, 2, None]', size: 'int | None', num_columns: 'int | None', nan: 'bool', cardinalities: 'numpy.ndarray | None', T: 'str | RuntimeType') -> None
+opendp.extras.numpy.NPArrayDDomain(*, shape: 'tuple[int, ...]', T: 'str | RuntimeType') -> None
+opendp.extras.numpy.Optional(*args, **kwds)
+opendp.extras.numpy.RuntimeType(origin, args=None)
+opendp.extras.numpy.RuntimeTypeDescriptor(*args, **kwargs)
+opendp.extras.numpy.array2_domain(*, norm: 'float | None' = None, p: 'Literal[1, 2, None]' = None, origin=None, size: 'int | None' = None, num_columns: 'int | None' = None, nan: 'Optional[bool]' = None, cardinalities: 'list[int] | numpy.ndarray | None' = None, T: 'RuntimeTypeDescriptor | None' = None) -> 'Domain'
+opendp.extras.numpy.arrayd_domain(*, shape: 'tuple[int, ...]', T: 'RuntimeTypeDescriptor') -> 'Domain'
+opendp.extras.numpy.asdict(obj, *, dict_factory=<class 'dict'>)
+opendp.extras.numpy.dataclass(cls=None, /, *, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False)
+opendp.extras.numpy.import_optional_dependency(name, raise_error=True)
+opendp.extras.numpy.make_np_clamp(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, norm, p, origin=None) -> opendp.mod.Transformation
+opendp.extras.numpy.then_np_clamp(norm, p, origin=None) -> opendp.mod.Transformation
+
+## opendp.extras.polars
+opendp.extras.polars.AIM(*, estimator: Callable = <function mirror_descent>, oneway: Literal['all', 'unkeyed'] = 'all', oneway_split: Optional[float] = None, queries: list[opendp.extras.mbi._utilities.Count] | int = 3, measure_split: float = 0.9, max_size: float = 80.0, rounds: Optional[int] = None) -> None
+    opendp.extras.polars.AIM.make_marginals(self, input_domain: opendp.mod.LazyFrameDomain, input_metric: opendp.mod.FrameDistance, output_measure: opendp.mod.Measure, d_in: list['Bound'], d_out: float, *, marginals: opendp.extras.mbi._utilities.Marginals, model) -> opendp.mod.Measurement
+opendp.extras.polars.Algorithm(*, estimator: Callable = <function mirror_descent>, oneway: Literal['all', 'unkeyed'] = 'all', oneway_split: Optional[float] = None) -> None
+    opendp.extras.polars.Algorithm.estimator(domain, loss_fn, *, potentials=None)
+    opendp.extras.polars.Algorithm.make_marginals(self, input_domain: opendp.mod.LazyFrameDomain, input_metric: opendp.mod.FrameDistance, output_measure: opendp.mod.Measure, d_in: list['Bound'], d_out: float, *, marginals: 'Marginals', model) -> opendp.mod.Measurement
+opendp.extras.polars.Any(*args, **kwargs)
+opendp.extras.polars.Bound(by: 'Sequence' = <factory>, per_group: 'int | None' = None, num_groups: 'int | None' = None) -> None
+opendp.extras.polars.ChangeOneIdDistance(...)
+opendp.extras.polars.ContingencyTable(keys: dict[str, typing.Any], cuts: dict[str, typing.Any], marginals: opendp.extras.mbi._utilities.Marginals, model: Any, thresholds: dict[str, int] = <factory>) -> None
+    opendp.extras.polars.ContingencyTable.project(self, attrs: Union[str, Sequence[str]])
+    opendp.extras.polars.ContingencyTable.project_melted(self, attrs: Union[str, Sequence[str]])
+    opendp.extras.polars.ContingencyTable.std(self, attrs: Sequence[str]) -> float
+    opendp.extras.polars.ContingencyTable.synthesize(self, rows: Optional[int] = None, method: Literal['round', 'sample'] = 'round')
+opendp.extras.polars.DPExpr(expr)
+    opendp.extras.polars.DPExpr.count(self, scale: 'float | None' = None, signed: 'bool | None' = None)
+    opendp.extras.polars.DPExpr.gaussian(self, scale: 'float | None' = None)
+    opendp.extras.polars.DPExpr.laplace(self, scale: 'float | None' = None)
+    opendp.extras.polars.DPExpr.len(self, scale: 'float | None' = None, signed: 'bool | None' = None)
+    opendp.extras.polars.DPExpr.mean(self, bounds: 'tuple[float, float]', scale: 'float | None' = None)
+    opendp.extras.polars.DPExpr.median(self, candidates: 'list[float]', scale: 'float | None' = None)
+    opendp.extras.polars.DPExpr.n_unique(self, scale: 'float | None' = None, signed: 'bool | None' = None)
+    opendp.extras.polars.DPExpr.noise(self, scale: 'float | None' = None)
+    opendp.extras.polars.DPExpr.null_count(self, scale: 'float | None' = None, signed: 'bool | None' = None)
+    opendp.extras.polars.DPExpr.quantile(self, alpha: 'float', candidates: 'list[float]', scale: 'float | None' = None)
+    opendp.extras.polars.DPExpr.sum(self, bounds: 'tuple[float, float]', scale: 'float | None' = None)
+opendp.extras.polars.Domain(...)
+    opendp.extras.polars.Domain.cast(self, type_: 'Type[D]') -> 'D'
+    opendp.extras.polars.Domain.member(self, val) -> 'bool'
+opendp.extras.polars.FrameDistance(...)
+opendp.extras.polars.LazyFrameQuery(polars_plan, query)
+    opendp.extras.polars.LazyFrameQuery.contingency_table(self, *, keys: 'Optional[Mapping[str, Sequence]]' = None, cuts: 'Optional[Mapping[str, Sequence[float]]]' = None, table: 'Optional[ContingencyTable]' = None, algorithm: 'Union[Algorithm]' = AIM(estimator=<function mirror_descent>, oneway='all', oneway_split=None, queries=3, measure_split=0.9, max_size=80.0, rounds=None)) -> "'ContingencyTableQuery'"
+    opendp.extras.polars.LazyFrameQuery.filter(self, *predicates, **constraints: 'Any') -> 'LazyFrameQuery'
+    opendp.extras.polars.LazyFrameQuery.group_by(self, *by, maintain_order: 'bool' = False, **named_by) -> 'LazyGroupByQuery'
+    opendp.extras.polars.LazyFrameQuery.join(self, other, on=None, how='inner', *, left_on=None, right_on=None, suffix: 'str' = '_right', validate='m:m', join_nulls: 'bool' = False, coalesce: 'bool | None' = None, allow_parallel: 'bool' = True, force_parallel: 'bool' = False) -> 'LazyFrameQuery'
+    opendp.extras.polars.LazyFrameQuery.release(self) -> 'OnceFrame'
+    opendp.extras.polars.LazyFrameQuery.resolve(self) -> 'Measurement'
+    opendp.extras.polars.LazyFrameQuery.select(self, *exprs, **named_exprs) -> 'LazyFrameQuery'
+    opendp.extras.polars.LazyFrameQuery.select_seq(self, *exprs, **named_exprs) -> 'LazyFrameQuery'
+    opendp.extras.polars.LazyFrameQuery.sort(self, by, *more_by, descending: 'bool | Sequence[bool]' = False, nulls_last: 'bool | Sequence[bool]' = False, maintain_order: 'bool' = False, multithreaded: 'bool' = True) -> 'LazyFrameQuery'
+    opendp.extras.polars.LazyFrameQuery.summarize(self, alpha: 'float | None' = None)
+    opendp.extras.polars.LazyFrameQuery.truncate_num_groups(self, k: 'int', by: 'list[Any]', keep: "Literal['sample', 'first', 'last']" = 'sample') -> 'LazyFrameQuery'
+    opendp.extras.polars.LazyFrameQuery.truncate_per_group(self, k: 'int', by: 'list[Any] | None' = None, keep: "Literal['sample', 'first', 'last'] | SortBy" = 'sample') -> 'LazyFrameQuery'
+    opendp.extras.polars.LazyFrameQuery.with_columns(self, *exprs, **named_exprs) -> 'LazyFrameQuery'
+    opendp.extras.polars.LazyFrameQuery.with_columns_seq(self, *exprs, **named_exprs) -> 'LazyFrameQuery'
+    opendp.extras.polars.LazyFrameQuery.with_keys(self, keys, on: 'list[str] | None' = None) -> 'LazyFrameQuery'
+opendp.extras.polars.LazyGroupByQuery(lgb_plan, query)
+    opendp.extras.polars.LazyGroupByQuery.agg(self, *aggs, **named_aggs) -> 'LazyFrameQuery'
+opendp.extras.polars.Literal(*args, **kwds)
+opendp.extras.polars.Mapping(*args, **kwargs)
+opendp.extras.polars.Margin(by: 'Sequence' = <factory>, max_length: 'int | None' = None, max_groups: 'int | None' = None, invariant: "Literal['keys'] | Literal['lengths'] | None" = None) -> None
+opendp.extras.polars.Measurement(...)
+    opendp.extras.polars.Measurement.check(self, d_in, d_out, *, debug=False) -> 'bool'
+    opendp.extras.polars.Measurement.invoke(self, arg)
+    opendp.extras.polars.Measurement.map(self, d_in)
+opendp.extras.polars.Metric(...)
+    opendp.extras.polars.Metric.cast(self, type_: 'Type[D]') -> 'D'
+opendp.extras.polars.OnceFrame(queryable)
+    opendp.extras.polars.OnceFrame.collect(self)
+    opendp.extras.polars.OnceFrame.lazy(self)
+opendp.extras.polars.OpenDPException(variant: 'str', message: 'Optional[str]' = None, raw_traceback: 'Optional[str]' = None)
+opendp.extras.polars.Optional(*args, **kwds)
+opendp.extras.polars.Sequence(*args, **kwargs)
+opendp.extras.polars.SortBy(by: 'Any', descending: 'bool | Sequence[bool]' = False, nulls_last: 'bool | Sequence[bool]' = False, multithreaded: 'bool' = True, maintain_order: 'bool' = False) -> None
+opendp.extras.polars.SymmetricIdDistance(...)
+opendp.extras.polars.Union(*args, **kwds)
+opendp.extras.polars.array_domain(element_domain: opendp.mod.Domain, width: int) -> opendp.mod.Domain
+opendp.extras.polars.asdict(obj, *, dict_factory=<class 'dict'>)
+opendp.extras.polars.atom_domain(bounds=None, nan=None, T: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None) -> opendp.mod.AtomDomain
+opendp.extras.polars.binary_search(predicate: 'Callable[[float], bool]', bounds: 'tuple[float | None, float | None] | None' = (None, None), T: 'Type[float] | None' = None, return_sign: 'bool' = False) -> 'float | tuple[float, int]'
+opendp.extras.polars.binary_search_chain(make_chain: 'Callable[[float], M]', d_in: 'Any', d_out: 'Any', bounds: 'tuple[float | None, float | None] | None' = (None, None), T=None) -> 'M'
+opendp.extras.polars.cast(typ, val)
+opendp.extras.polars.categorical_domain(categories=None) -> opendp.mod.Domain
+opendp.extras.polars.dataclass(cls=None, /, *, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False)
+opendp.extras.polars.datetime_domain(time_unit: str = 'us', time_zone: Optional[str] = None) -> opendp.mod.Domain
+opendp.extras.polars.deprecated(*args, **kwargs)
+opendp.extras.polars.dp_len(scale: 'float | None' = None, signed: 'bool | None' = None)
+opendp.extras.polars.enum_domain(categories) -> opendp.mod.Domain
+opendp.extras.polars.field(*, default=<dataclasses._MISSING_TYPE object>, default_factory=<dataclasses._MISSING_TYPE object>, init=True, repr=True, hash=None, compare=True, metadata=None, kw_only=<dataclasses._MISSING_TYPE object>)
+opendp.extras.polars.import_optional_dependency(name, raise_error=True)
+opendp.extras.polars.lazyframe_domain(series_domains) -> opendp.mod.LazyFrameDomain
+opendp.extras.polars.make_contingency_table(input_domain: opendp.mod.LazyFrameDomain, input_metric: opendp.mod.FrameDistance, output_measure: opendp.mod.Measure, d_in: list['Bound'], d_out: Union[float, tuple[float, float]], keys: Optional[Mapping[str, Sequence]] = None, cuts: Optional[Mapping[str, Sequence[float]]] = None, table: Optional[opendp.extras.mbi._table.ContingencyTable] = None, algorithm: opendp.extras.mbi._utilities.Algorithm = AIM(estimator=<function mirror_descent>, oneway='all', oneway_split=None, queries=3, measure_split=0.9, max_size=80.0, rounds=None)) -> tuple[opendp.mod.Measurement, typing.Optional[float], typing.Optional[int]]
+opendp.extras.polars.make_private_lazyframe(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, output_measure: opendp.mod.Measure, lazyframe, global_scale=None, threshold=None) -> opendp.mod.Measurement
+opendp.extras.polars.make_stable_lazyframe(input_domain: opendp.mod.Domain, input_metric: opendp.mod.Metric, lazyframe, MO: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias] = 'MI') -> opendp.mod.Transformation
+opendp.extras.polars.option_domain(element_domain: opendp.mod.Domain, D: Union[ForwardRef('RuntimeType'), str, Type[Union[Sequence[Any], tuple[Any, Any], float, str, bool]], tuple['RuntimeTypeDescriptor', ...], _GenericAlias, types.GenericAlias, NoneType] = None) -> opendp.mod.OptionDomain
+opendp.extras.polars.replace(obj, /, **changes)
+opendp.extras.polars.series_domain(name: str, element_domain: opendp.mod.Domain) -> opendp.mod.SeriesDomain
+opendp.extras.polars.warn(message, category=None, stacklevel=1, source=None)
+
+## opendp.extras.sklearn
+
+## opendp.extras.sklearn.decomposition
+opendp.extras.sklearn.decomposition.Domain(...)
+    opendp.extras.sklearn.decomposition.Domain.cast(self, type_: 'Type[D]') -> 'D'
+    opendp.extras.sklearn.decomposition.Domain.member(self, val) -> 'bool'
+opendp.extras.sklearn.decomposition.Measurement(...)
+    opendp.extras.sklearn.decomposition.Measurement.check(self, d_in, d_out, *, debug=False) -> 'bool'
+    opendp.extras.sklearn.decomposition.Measurement.invoke(self, arg)
+    opendp.extras.sklearn.decomposition.Measurement.map(self, d_in)
+opendp.extras.sklearn.decomposition.Metric(...)
+    opendp.extras.sklearn.decomposition.Metric.cast(self, type_: 'Type[D]') -> 'D'
+opendp.extras.sklearn.decomposition.Optional(*args, **kwds)
+opendp.extras.sklearn.decomposition.PCA(*, epsilon: 'float', row_norm: 'float', n_samples: 'int', n_features: 'int', n_components: 'int | float | str | None' = None, n_changes: 'int' = 1, whiten: 'bool' = False) -> 'None'
+    opendp.extras.sklearn.decomposition.PCA.fit(self, X, y=None)
+    opendp.extras.sklearn.decomposition.PCA.measurement(self) -> 'Measurement'
+opendp.extras.sklearn.decomposition.PCAEpsilons(*, eigvals: 'float', eigvecs: 'Sequence[float]', mean: 'Optional[float]') -> None
+opendp.extras.sklearn.decomposition.Sequence(*args, **kwargs)
+opendp.extras.sklearn.decomposition.asdict(obj, *, dict_factory=<class 'dict'>)
+opendp.extras.sklearn.decomposition.astuple(obj, *, tuple_factory=<class 'tuple'>)
+opendp.extras.sklearn.decomposition.dataclass(cls=None, /, *, init=True, repr=True, eq=True, order=False, unsafe_hash=False, frozen=False, match_args=True, kw_only=False, slots=False, weakref_slot=False)
+opendp.extras.sklearn.decomposition.import_optional_dependency(name, raise_error=True)
+opendp.extras.sklearn.decomposition.make_private_np_mean(input_domain: 'Domain', input_metric: 'Metric', scale: 'float', norm: 'float | None' = None, p: 'int | None' = 2, origin=None) -> 'Measurement'
+opendp.extras.sklearn.decomposition.make_private_pca(input_domain: 'Domain', input_metric: 'Metric', unit_epsilon: 'float | PCAEpsilons', norm: 'float | None' = None, num_components=None) -> 'Measurement'
+opendp.extras.sklearn.decomposition.register(constructor: Callable[..., Union[opendp.mod.Transformation, opendp.mod.Measurement]], name: Optional[str] = None)
+opendp.extras.sklearn.decomposition.then_center()
+opendp.extras.sklearn.decomposition.then_np_clamp(norm, p, origin=None) -> opendp.mod.Transformation
+opendp.extras.sklearn.decomposition.then_private_np_eigendecomposition(eigvals_epsilon: 'float', eigvecs_epsilons: 'Sequence[float]', num_components: 'int | None' = None) -> 'Measurement'
+opendp.extras.sklearn.decomposition.then_private_pca(unit_epsilon: 'float | PCAEpsilons', norm: 'float | None' = None, num_components=None) -> 'Measurement'
+opendp.extras.sklearn.decomposition.to_then(constructor) -> Callable[..., opendp.mod._PartialConstructor]
+
+## opendp.extras.sklearn.linear_model
+opendp.extras.sklearn.linear_model.LinearRegression(output_measure: opendp.mod.Measure, x_bounds: Iterable[tuple[float, float]], y_bounds: tuple[float, float], scale: float, runs: int = 1, candidates_count: int = 100, fraction_bounds: tuple[float, float] = (0.25, 0.75))
+    opendp.extras.sklearn.linear_model.LinearRegression.fit(self, X, y)
+    opendp.extras.sklearn.linear_model.LinearRegression.predict(X)
+
+## opendp.extras.mbi
+opendp.extras.mbi.AIM(*, estimator: Callable = <function mirror_descent>, oneway: Literal['all', 'unkeyed'] = 'all', oneway_split: Optional[float] = None, queries: list[opendp.extras.mbi._utilities.Count] | int = 3, measure_split: float = 0.9, max_size: float = 80.0, rounds: Optional[int] = None) -> None
+    opendp.extras.mbi.AIM.make_marginals(self, input_domain: opendp.mod.LazyFrameDomain, input_metric: opendp.mod.FrameDistance, output_measure: opendp.mod.Measure, d_in: list['Bound'], d_out: float, *, marginals: opendp.extras.mbi._utilities.Marginals, model) -> opendp.mod.Measurement
+opendp.extras.mbi.Algorithm(*, estimator: Callable = <function mirror_descent>, oneway: Literal['all', 'unkeyed'] = 'all', oneway_split: Optional[float] = None) -> None
+    opendp.extras.mbi.Algorithm.estimator(domain, loss_fn, *, potentials=None)
+    opendp.extras.mbi.Algorithm.make_marginals(self, input_domain: opendp.mod.LazyFrameDomain, input_metric: opendp.mod.FrameDistance, output_measure: opendp.mod.Measure, d_in: list['Bound'], d_out: float, *, marginals: 'Marginals', model) -> opendp.mod.Measurement
+opendp.extras.mbi.ContingencyTable(keys: dict[str, typing.Any], cuts: dict[str, typing.Any], marginals: opendp.extras.mbi._utilities.Marginals, model: Any, thresholds: dict[str, int] = <factory>) -> None
+    opendp.extras.mbi.ContingencyTable.project(self, attrs: Union[str, Sequence[str]])
+    opendp.extras.mbi.ContingencyTable.project_melted(self, attrs: Union[str, Sequence[str]])
+    opendp.extras.mbi.ContingencyTable.std(self, attrs: Sequence[str]) -> float
+    opendp.extras.mbi.ContingencyTable.synthesize(self, rows: Optional[int] = None, method: Literal['round', 'sample'] = 'round')
+opendp.extras.mbi.Count(by: tuple[str, ...], weight: float = 1.0) -> None
+opendp.extras.mbi.Fixed(*, estimator: Callable = <function mirror_descent>, oneway: Literal['all', 'unkeyed'] = 'unkeyed', oneway_split: Optional[float] = None, queries: list[opendp.extras.mbi._utilities.Count]) -> None
+    opendp.extras.mbi.Fixed.make_marginals(self, input_domain: opendp.mod.LazyFrameDomain, input_metric: opendp.mod.FrameDistance, output_measure: opendp.mod.Measure, d_in: list['Bound'], d_out: float, *, marginals: opendp.extras.mbi._utilities.Marginals, model: Any)
+opendp.extras.mbi.MST(*, estimator: Callable = <function mirror_descent>, oneway: Literal['all', 'unkeyed'] = 'all', oneway_split: Optional[float] = None, measure_split: float = 0.9, num_selections: Optional[int] = None) -> None
+    opendp.extras.mbi.MST.make_marginals(self, input_domain: opendp.mod.LazyFrameDomain, input_metric: opendp.mod.FrameDistance, output_measure: opendp.mod.Measure, d_in: list['Bound'], d_out: float, *, marginals: opendp.extras.mbi._utilities.Marginals, model: Any) -> opendp.mod.Measurement
+opendp.extras.mbi.Marginals(by_clique: Optional[dict[tuple[str, ...], list]] = None)
+    opendp.extras.mbi.Marginals.add(self, *new_measurements) -> 'Marginals'
+    opendp.extras.mbi.Marginals.cliques(self) -> list[tuple[str, ...]]
+    opendp.extras.mbi.Marginals.copy(self) -> 'Marginals'
+    opendp.extras.mbi.Marginals.flatten(self) -> list
+opendp.extras.mbi.Sequential(*, estimator: Callable = <function mirror_descent>, oneway: Literal['all', 'unkeyed'] = 'all', oneway_split: Optional[float] = None, algorithms: list[opendp.extras.mbi._utilities.Algorithm], weights: Optional[list[float]] = None) -> None
+    opendp.extras.mbi.Sequential.make_marginals(self, input_domain: opendp.mod.LazyFrameDomain, input_metric: opendp.mod.FrameDistance, output_measure: opendp.mod.Measure, d_in: list['Bound'], d_out: float, *, marginals: opendp.extras.mbi._utilities.Marginals, model: Any)
+opendp.extras.mbi.make_contingency_table(input_domain: opendp.mod.LazyFrameDomain, input_metric: opendp.mod.FrameDistance, output_measure: opendp.mod.Measure, d_in: list['Bound'], d_out: Union[float, tuple[float, float]], keys: Optional[Mapping[str, Sequence]] = None, cuts: Optional[Mapping[str, Sequence[float]]] = None, table: Optional[opendp.extras.mbi._table.ContingencyTable] = None, algorithm: opendp.extras.mbi._utilities.Algorithm = AIM(estimator=<function mirror_descent>, oneway='all', oneway_split=None, queries=3, measure_split=0.9, max_size=80.0, rounds=None)) -> tuple[opendp.mod.Measurement, typing.Optional[float], typing.Optional[int]]
+opendp.extras.mbi.mirror_descent(domain, loss_fn, *, potentials=None)
+
+## opendp.extras.examples
+opendp.extras.examples.Path(*args, **kwargs)
+opendp.extras.examples.get_california_pums_path() -> pathlib.Path
+opendp.extras.examples.get_france_lfs_path() -> pathlib.Path

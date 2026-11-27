@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llmdpeval"
+version = "0.1.0"
+description = "Can LLMs write differentially private code? Generation, retrieval, evaluation and grading."
+requires-python = ">=3.11"
+# Dependencies are pinned in requirements-lock.txt; install that first.
+
+[tool.setuptools.packages.find]
+where = ["src"]

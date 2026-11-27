@@ -1,0 +1,29 @@
+# R environment for Imai & Khanna (Political Analysis 2016). The code dates from Dec 2015 - Jan 2016 (R 3.2.x era).
+# conda-forge's oldest R builds are 3.3.2 (sparse) and 3.5.1 (full); we use 3.5.1 like the Frymer recipe.
+# R < 3.6 keeps the pre-2019 sample() RNG, so set.seed(3) in KingEI.R draws as it did in 2016.
+# The packages that compute the paper's numbers (wru, ei, eiPack, and ei's numeric imports) are installed by
+# cran_packages.R at the exact versions current on 2016-01-20 from the CRAN Archive. The packages below only
+# satisfy imports (plotting, iteration) and come prebuilt from conda-forge.
+name: imai2016
+channels: [conda-forge]
+dependencies:
+  - r-base=3.5.1
+  - r-mass
+  - r-matrix
+  - r-foreach
+  - r-iterators
+  - r-sp
+  - r-rgl
+  - r-plotrix
+  - r-ellipse
+  - r-gplots
+  - r-zoo
+  - r-survival   # msm
+  - r-expm       # msm
+  - r-coda       # eiPack
+  - libglvnd-glx-cos7-x86_64
+  - mesa-libgl-cos7-x86_64
+  - c-compiler
+  - cxx-compiler
+  - fortran-compiler
+  - make
